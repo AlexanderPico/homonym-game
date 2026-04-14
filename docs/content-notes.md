@@ -100,3 +100,9 @@ Next editorial pass:
 - promote 7-10 strongest entries into the polished demo queue
 - keep aliases rare and intentional
 - mark puzzles clearly as `prototype`, `reviewed`, or `published`
+
+Latest pass applied:
+- removed direct answer-word leakage from flagged clues
+- tightened several overly easy or overly abstract clues
+- corrected the `flower flour` baking explanation
+- reclassified `naval navel` and `plain plane` as mid-tier rather than shortlist-level
