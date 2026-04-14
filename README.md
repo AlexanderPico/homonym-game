@@ -37,14 +37,32 @@ Current demo behavior:
 - typo-aware near-match feedback for guesses that are one misspelling away
 - three-guess limit per puzzle
 - spoiler-safe share glyph summary after solve, fail, or reveal
-- `Next puzzle` rotates through the full 20-puzzle draft set
+- `Next puzzle` rotates through the full 40-puzzle draft set
 - editorial styling aimed at a polished daily-game feel
 
 ## Current content state
 
 - `content/puzzles/starter-puzzles.js` preserves the original 3-puzzle seed set
-- `content/puzzles/draft-20.js` is now the active 20-puzzle corpus for the demo
-- `docs/content-notes.md` tracks the current shortlist and open content questions
+- `content/puzzles/draft-40.js` is now the active 40-puzzle corpus for the demo
+- the 40-entry corpus now has revised difficulty assignments, including a real hard tier
+- `docs/content-notes.md` tracks the current shortlist, weak spots, and editorial rules
+
+## Reality check
+
+Web research did not surface a major existing daily game with this exact clue-to-homophone-pair format. The closest public relatives are:
+- Hink Pink / Hinky Pinky style clue-to-word-pair puzzles
+- dictionary homophone quizzes
+- cryptic crossword homophone clueing
+
+Best corpus sources appear to be generated rather than copied:
+- CMU Pronouncing Dictionary
+- Datamuse homophone lookup
+- Wiktionary for definitions/pronunciations
+- wordfreq for familiarity filtering
+
+So the current recommendation is:
+- treat the format as reasonably original in product form
+- build your own curated corpus rather than relying on a huge ready-made public list
 
 ## Verification
 

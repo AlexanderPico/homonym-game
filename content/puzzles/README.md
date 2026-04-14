@@ -1,7 +1,8 @@
 This directory holds puzzle data and editorial assets.
 
 Current contents:
-- `starter-puzzles.js` — locally loadable prototype corpus for the web demo
+- `starter-puzzles.js` — original locally loadable seed corpus for the web demo
+- `draft-40.js` — active 40-puzzle draft corpus used by the current prototype
 
 Current puzzle record fields:
 - `id`

@@ -39,7 +39,7 @@ A Homonym Game puzzle contains:
 ## Current files
 
 - `starter-puzzles.js` — the original 3-puzzle seed corpus
-- `draft-20.js` — the active 20-candidate corpus now wired into the prototype demo
+- `draft-40.js` — the active 40-candidate corpus now wired into the prototype demo
 
 ## Starter set
 
@@ -47,33 +47,52 @@ A Homonym Game puzzle contains:
 2. lazy golden calf -> idle idol
 3. thief of shepherd's tools -> crook crook
 
-## First 20-candidate batch
+## Active 40-puzzle draft corpus
 
-Strong early shortlist:
+Current strongest easy/medium candidates:
 - vile vial
 - idle idol
-- mourning morning
 - sole soul
 - minor miner
-- allowed aloud
 - flower flour
 - pair pear
+- knight night
+- steel steal
+- cent scent
+- yoke yolk
+- kernel colonel
+- altar alter
 
-Potentially usable with more wording work:
+Promising but still mid-tier or tone-sensitive:
+- mourning morning
+- naval navel
 - dear deer
-- weak week
+- plain plane
 - serial cereal
 - principal principle
 - waist waste
-- male mail
+- allowed aloud
 - sight site
-- knight night
 - aisle isle
-- naval navel
-- plain plane
+- cue queue
+- scene seen
+- suite sweet
+- peak peek
+- flew flu
+- pause paws
 
 Riskier / boundary-case entries:
 - crook crook
+- male mail
+- berry bury
+
+Hard-mode anchors now in corpus:
+- crook crook
+- principal principle
+- male mail
+- kernel colonel
+- altar alter
+- berry bury
 
 ## Open content questions
 
@@ -95,14 +114,15 @@ Possible stages:
 ## Near-term authoring need
 
 Next editorial pass:
-- cut weak or redundant entries from the first 20
+- cut weak or redundant entries from the 40
 - improve clue wording for the mid-tier candidates
-- promote 7-10 strongest entries into the polished demo queue
+- promote 10-14 strongest entries into the polished demo queue
 - keep aliases rare and intentional
 - mark puzzles clearly as `prototype`, `reviewed`, or `published`
 
 Latest pass applied:
+- expanded the active corpus from 20 to 40 entries
+- redistributed difficulty so the set now includes a real hard tier
 - removed direct answer-word leakage from flagged clues
 - tightened several overly easy or overly abstract clues
 - corrected the `flower flour` baking explanation
-- reclassified `naval navel` and `plain plane` as mid-tier rather than shortlist-level
