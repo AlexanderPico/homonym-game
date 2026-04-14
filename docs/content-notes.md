@@ -13,8 +13,9 @@ A Homonym Game puzzle contains:
 1. The answer should sound natural when spoken.
 2. The answer should preferably be a legitimate phrase, not just repeated sound coincidence.
 3. The clue should point to both words fairly.
-4. The joke should survive first contact — payoff matters.
-5. Avoid clues whose solution space is too broad without strong anchoring.
+4. Never use an answer word, obvious inflection, or trivially recycled form of the answer inside the clue.
+5. The joke should survive first contact — payoff matters.
+6. Avoid clues whose solution space is too broad without strong anchoring.
 
 ## Current prototype schema
 
@@ -52,9 +53,7 @@ Strong early shortlist:
 - vile vial
 - idle idol
 - mourning morning
-- naval navel
 - sole soul
-- plain plane
 - minor miner
 - allowed aloud
 - flower flour
@@ -70,6 +69,8 @@ Potentially usable with more wording work:
 - sight site
 - knight night
 - aisle isle
+- naval navel
+- plain plane
 
 Riskier / boundary-case entries:
 - crook crook
