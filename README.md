@@ -33,8 +33,10 @@ No build step is required for the current prototype.
 
 Current demo behavior:
 - one featured puzzle at a time
-- typed guesses
-- reveal fallback
+- typed guesses with no answer-revealing placeholder text
+- typo-aware near-match feedback for guesses that are one misspelling away
+- three-guess limit per puzzle
+- spoiler-safe share glyph summary after solve, fail, or reveal
 - `Next puzzle` rotates through the full 20-puzzle draft set
 - editorial styling aimed at a polished daily-game feel
 

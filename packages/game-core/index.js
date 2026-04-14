@@ -28,6 +28,43 @@
     return [canonical].concat(aliases).filter(Boolean);
   }
 
+  function levenshteinDistance(a, b) {
+    const left = normalizeGuess(a);
+    const right = normalizeGuess(b);
+    const rows = left.length + 1;
+    const cols = right.length + 1;
+    const table = Array.from({ length: rows }, () => Array(cols).fill(0));
+
+    for (let i = 0; i < rows; i += 1) {
+      table[i][0] = i;
+    }
+    for (let j = 0; j < cols; j += 1) {
+      table[0][j] = j;
+    }
+
+    for (let i = 1; i < rows; i += 1) {
+      for (let j = 1; j < cols; j += 1) {
+        const cost = left[i - 1] === right[j - 1] ? 0 : 1;
+        table[i][j] = Math.min(
+          table[i - 1][j] + 1,
+          table[i][j - 1] + 1,
+          table[i - 1][j - 1] + cost,
+        );
+
+        if (
+          i > 1 &&
+          j > 1 &&
+          left[i - 1] === right[j - 2] &&
+          left[i - 2] === right[j - 1]
+        ) {
+          table[i][j] = Math.min(table[i][j], table[i - 2][j - 2] + 1);
+        }
+      }
+    }
+
+    return table[rows - 1][cols - 1];
+  }
+
   function isCorrectGuess(puzzle, guess) {
     const normalizedGuess = normalizeGuess(guess);
     if (!normalizedGuess) {
@@ -35,6 +72,21 @@
     }
 
     return getAcceptedAnswers(puzzle).map(normalizeGuess).includes(normalizedGuess);
+  }
+
+  function getGuessResult(puzzle, guess) {
+    const normalizedGuess = normalizeGuess(guess);
+    if (!normalizedGuess) {
+      return 'miss';
+    }
+
+    const accepted = getAcceptedAnswers(puzzle).map(normalizeGuess);
+    if (accepted.includes(normalizedGuess)) {
+      return 'exact';
+    }
+
+    const isClose = accepted.some((answer) => levenshteinDistance(answer, normalizedGuess) === 1);
+    return isClose ? 'close' : 'miss';
   }
 
   function getGuessShape(guess) {
@@ -57,12 +109,30 @@
     return `Puzzle ${index + 1} of ${total}`;
   }
 
+  function buildShareGlyph(results, maxAttempts) {
+    const glyphs = {
+      exact: '◆',
+      close: '◈',
+      miss: '◇',
+      unused: '—',
+    };
+
+    const filled = results.slice(0, maxAttempts).map((result) => glyphs[result] || glyphs.miss);
+    while (filled.length < maxAttempts) {
+      filled.push(glyphs.unused);
+    }
+    return filled.join('');
+  }
+
   return {
     normalizeGuess,
     getCanonicalAnswer,
     getAcceptedAnswers,
+    levenshteinDistance,
     isCorrectGuess,
+    getGuessResult,
     getGuessShape,
     getPuzzleProgressLabel,
+    buildShareGlyph,
   };
 });

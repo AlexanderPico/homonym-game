@@ -25,8 +25,8 @@
           <h2 id="how-to-play-title">Think of the phrase. Type the pair.</h2>
         </div>
         <p>
-          This demo presents one puzzle at a time. Submit a guess, then move to the next puzzle as if
-          it were tomorrow’s game.
+          You get three guesses. Near-miss typos are called out, and your result turns into a shareable
+          glyph line without giving away the answer.
         </p>
       </section>
 
@@ -38,6 +38,14 @@
 
         <h2 id="puzzle-title" class="clue-text">loathsome test tube</h2>
         <p id="status-text" class="status-text">Type your best guess.</p>
+
+        <section class="attempts-panel" aria-label="guess tracking">
+          <div class="attempts-copy">
+            <p class="attempts-label">Attempts</p>
+            <p id="attempt-summary" class="attempt-summary">3 guesses left</p>
+          </div>
+          <div id="attempt-glyphs" class="attempt-glyphs" aria-live="polite">— — —</div>
+        </section>
 
         <form id="guess-form" class="guess-form" novalidate>
           <label class="guess-label" for="guess-input">Your guess</label>
@@ -51,10 +59,10 @@
               autocomplete="off"
               autocapitalize="none"
               spellcheck="false"
-              placeholder="e.g. vile vial"
+              placeholder="Type a two-word phrase"
               aria-describedby="status-text"
             />
-            <button type="submit" class="primary-button">Check</button>
+            <button id="check-button" type="submit" class="primary-button">Check</button>
           </div>
         </form>
 
@@ -70,6 +78,19 @@
           <div id="answer-text" class="answer-text">vile vial</div>
           <ul id="explanation-list" class="explanation-list"></ul>
           <p id="notes-text" class="notes-text"></p>
+        </section>
+
+        <section id="share-panel" class="share-panel" aria-live="polite" hidden>
+          <div class="share-header">
+            <div>
+              <p class="result-label">Share this run</p>
+              <p id="share-caption" class="share-caption">Spoiler-safe summary</p>
+            </div>
+            <button id="copy-share-button" type="button" class="secondary-button secondary-button--compact">
+              Copy glyphs
+            </button>
+          </div>
+          <pre id="share-text" class="share-text"></pre>
         </section>
       </section>
 

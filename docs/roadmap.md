@@ -22,8 +22,10 @@ Deliverables:
 - simple mobile-friendly web page
 - one featured clue at a time
 - typed answer checking
+- typo-aware near-match feedback
+- three-guess limit with spoiler-safe share glyphs
 - reveal fallback
-- demo `Next puzzle` flow across a tiny starter corpus
+- demo `Next puzzle` flow across the active draft corpus
 - basic explanation of the mechanic
 
 Questions to answer:
@@ -41,8 +43,10 @@ Primary interaction model:
 1. Read the clue.
 2. Type a two-word answer.
 3. Check the guess.
-4. Reveal only if stuck.
-5. Move to the next demo puzzle.
+4. If you are one typo away, get a near-match warning instead of a generic miss.
+5. Solve within three guesses, or reveal only if stuck.
+6. Share a spoiler-safe glyph summary.
+7. Move to the next demo puzzle.
 
 Design concerns:
 - mobile thumb ergonomics

@@ -7,6 +7,8 @@ const {
   getPuzzleProgressLabel,
   getAcceptedAnswers,
   getGuessShape,
+  getGuessResult,
+  buildShareGlyph,
 } = require('../packages/game-core/index.js');
 
 test('normalizeGuess lowercases and collapses punctuation-like separators', () => {
@@ -42,6 +44,24 @@ test('getGuessShape distinguishes empty one-word two-word and longer guesses', (
   assert.equal(getGuessShape('vile'), 'one-word');
   assert.equal(getGuessShape('vile vial'), 'two-word');
   assert.equal(getGuessShape('the vile vial'), 'longer');
+});
+
+test('getGuessResult marks exact, close typo, and miss distinctly', () => {
+  const puzzle = {
+    displayAnswer: 'vile vial',
+    answerWords: ['vile', 'vial'],
+    aliases: ['vile-vial'],
+  };
+
+  assert.equal(getGuessResult(puzzle, 'vile vial'), 'exact');
+  assert.equal(getGuessResult(puzzle, 'vile vail'), 'close');
+  assert.equal(getGuessResult(puzzle, 'idle idol'), 'miss');
+});
+
+test('buildShareGlyph summarizes three-attempt runs without spoilers', () => {
+  assert.equal(buildShareGlyph(['miss', 'close', 'exact'], 3), '◇◈◆');
+  assert.equal(buildShareGlyph(['miss', 'miss'], 3), '◇◇—');
+  assert.equal(buildShareGlyph(['close', 'miss', 'miss'], 3), '◈◇◇');
 });
 
 test('getPuzzleProgressLabel reports current position for demo next flow', () => {

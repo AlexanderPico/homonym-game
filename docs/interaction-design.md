@@ -21,6 +21,9 @@ For the current prototype, use a single featured puzzle:
 - present one clue at a time
 - let the player type a guess immediately
 - provide a single primary action: Check
+- call out near-miss typos separately from ordinary misses
+- cap each puzzle at three guesses
+- generate a spoiler-safe glyph line for sharing
 - keep Reveal answer as an escape hatch if the player is stuck
 - use Next puzzle to simulate tomorrow's puzzle in the demo
 
@@ -80,9 +83,11 @@ Top of page:
 
 Main section:
 - single clue card
+- three-attempt tracker
 - text input
 - check / reveal / next actions
 - answer explanation after solve or reveal
+- share glyph panel after puzzle closure
 
 Bottom section:
 - note about future daily-play direction
