@@ -35,13 +35,13 @@ Current demo behavior:
 - one featured puzzle at a time
 - typed guesses
 - reveal fallback
-- `Next puzzle` to simulate future daily rotation
+- `Next puzzle` rotates through the full 20-puzzle draft set
 - editorial styling aimed at a polished daily-game feel
 
 ## Current content state
 
-- `content/puzzles/starter-puzzles.js` contains the 3-puzzle demo corpus
-- `content/puzzles/draft-20.js` contains the first 20 draft candidates for editorial review
+- `content/puzzles/starter-puzzles.js` preserves the original 3-puzzle seed set
+- `content/puzzles/draft-20.js` is now the active 20-puzzle corpus for the demo
 - `docs/content-notes.md` tracks the current shortlist and open content questions
 
 ## Verification

@@ -37,8 +37,8 @@ A Homonym Game puzzle contains:
 
 ## Current files
 
-- `starter-puzzles.js` — the 3-puzzle demo corpus wired into the current prototype
-- `draft-20.js` — the first 20 candidate entries for editorial review
+- `starter-puzzles.js` — the original 3-puzzle seed corpus
+- `draft-20.js` — the active 20-candidate corpus now wired into the prototype demo
 
 ## Starter set
 

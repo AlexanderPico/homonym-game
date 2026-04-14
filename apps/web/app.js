@@ -1,4 +1,8 @@
-const puzzles = Array.isArray(globalThis.HOMONYM_PUZZLES) ? globalThis.HOMONYM_PUZZLES : [];
+const puzzles = Array.isArray(globalThis.HOMONYM_DRAFT_PUZZLES)
+  ? globalThis.HOMONYM_DRAFT_PUZZLES
+  : Array.isArray(globalThis.HOMONYM_PUZZLES)
+    ? globalThis.HOMONYM_PUZZLES
+    : [];
 const { isCorrectGuess, getPuzzleProgressLabel, getGuessShape } = globalThis.HomonymGameCore || {};
 
 const progressPill = document.getElementById('progress-pill');
