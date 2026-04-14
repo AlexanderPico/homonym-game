@@ -9,6 +9,8 @@ const {
   getGuessShape,
   getGuessResult,
   buildShareGlyph,
+  getDailyPuzzleIndex,
+  getAppMode,
 } = require('../packages/game-core/index.js');
 
 test('normalizeGuess lowercases and collapses punctuation-like separators', () => {
@@ -62,6 +64,21 @@ test('buildShareGlyph summarizes three-attempt runs without spoilers', () => {
   assert.equal(buildShareGlyph(['miss', 'close', 'exact'], 3), '◇◈◆');
   assert.equal(buildShareGlyph(['miss', 'miss'], 3), '◇◇—');
   assert.equal(buildShareGlyph(['close', 'miss', 'miss'], 3), '◈◇◇');
+});
+
+test('getDailyPuzzleIndex is deterministic and stays in range', () => {
+  assert.equal(getDailyPuzzleIndex('2026-04-14', 40), getDailyPuzzleIndex('2026-04-14', 40));
+  assert.equal(getDailyPuzzleIndex('2026-04-15', 40), 7);
+  assert.ok(getDailyPuzzleIndex('2026-04-14', 40) >= 0);
+  assert.ok(getDailyPuzzleIndex('2026-04-14', 40) < 40);
+});
+
+test('getAppMode distinguishes admin and daily routes', () => {
+  assert.equal(getAppMode('/'), 'daily');
+  assert.equal(getAppMode('/index.html'), 'daily');
+  assert.equal(getAppMode('/admin'), 'admin');
+  assert.equal(getAppMode('/admin/'), 'admin');
+  assert.equal(getAppMode('/admin/index.html'), 'admin');
 });
 
 test('getPuzzleProgressLabel reports current position for demo next flow', () => {

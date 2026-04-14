@@ -109,6 +109,32 @@
     return `Puzzle ${index + 1} of ${total}`;
   }
 
+  function getDailyPuzzleIndex(dateString, total) {
+    if (!total || total < 1) {
+      return 0;
+    }
+
+    const match = String(dateString || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) {
+      return 0;
+    }
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    const utcMillis = Date.UTC(year, month - 1, day);
+    const ordinal = Math.floor(utcMillis / 86400000);
+    return (ordinal + 9) % total;
+  }
+
+  function getAppMode(pathname) {
+    const normalized = String(pathname || '/').replace(/\/+$/, '') || '/';
+    if (normalized === '/admin' || normalized.endsWith('/admin') || normalized.endsWith('/admin/index.html')) {
+      return 'admin';
+    }
+    return 'daily';
+  }
+
   function buildShareGlyph(results, maxAttempts) {
     const glyphs = {
       exact: '◆',
@@ -133,6 +159,8 @@
     getGuessResult,
     getGuessShape,
     getPuzzleProgressLabel,
+    getDailyPuzzleIndex,
+    getAppMode,
     buildShareGlyph,
   };
 });
