@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Homonym Game</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="masthead">
+        <p class="section-label">Prototype</p>
+        <div class="masthead-row">
+          <h1>Homonym Game</h1>
+          <div id="progress-pill" class="progress-pill" aria-live="polite">Puzzle 1 of 3</div>
+        </div>
+        <p class="lede">
+          Decode the clue into a two-word answer whose words sound right and land as a phrase.
+        </p>
+      </header>
+
+      <section class="intro-card" aria-labelledby="how-to-play-title">
+        <div>
+          <p class="kicker">How to play</p>
+          <h2 id="how-to-play-title">Think of the phrase. Type the pair.</h2>
+        </div>
+        <p>
+          This demo presents one puzzle at a time. Submit a guess, then move to the next puzzle as if
+          it were tomorrow’s game.
+        </p>
+      </section>
+
+      <section class="game-card" aria-labelledby="puzzle-title">
+        <div class="card-meta-row">
+          <p class="card-label">Today’s clue</p>
+          <p id="difficulty-badge" class="difficulty-badge">Easy</p>
+        </div>
+
+        <h2 id="puzzle-title" class="clue-text">loathsome test tube</h2>
+        <p id="status-text" class="status-text">Type your best guess.</p>
+
+        <form id="guess-form" class="guess-form" novalidate>
+          <label class="guess-label" for="guess-input">Your guess</label>
+          <div class="guess-row">
+            <input
+              id="guess-input"
+              name="guess"
+              class="guess-input"
+              type="text"
+              inputmode="text"
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+              placeholder="e.g. vile vial"
+              aria-describedby="status-text"
+            />
+            <button type="submit" class="primary-button">Check</button>
+          </div>
+        </form>
+
+        <div class="action-row">
+          <button id="reveal-button" type="button" class="secondary-button">Reveal answer</button>
+          <button id="next-button" type="button" class="secondary-button secondary-button--accent">
+            Next puzzle
+          </button>
+        </div>
+
+        <section id="result-panel" class="result-panel" aria-live="polite" hidden>
+          <p class="result-label">Answer</p>
+          <div id="answer-text" class="answer-text">vile vial</div>
+          <ul id="explanation-list" class="explanation-list"></ul>
+          <p id="notes-text" class="notes-text"></p>
+        </section>
+      </section>
+
+      <footer class="footer-note">
+        <p>
+          Long-term direction: a polished daily social word game. Current focus: make the solve loop feel
+          crisp, elegant, and fair on a phone.
+        </p>
+      </footer>
+    </main>
+
+    <script src="../../content/puzzles/starter-puzzles.js"></script>
+    <script src="../../packages/game-core/index.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

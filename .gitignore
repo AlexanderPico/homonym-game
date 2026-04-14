@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Node / future web tooling
+node_modules/
+dist/
+build/
+coverage/
+
+# Editor / temp
+*.swp
+*.tmp

@@ -1,0 +1,50 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+
+const {
+  normalizeGuess,
+  isCorrectGuess,
+  getPuzzleProgressLabel,
+  getAcceptedAnswers,
+  getGuessShape,
+} = require('../packages/game-core/index.js');
+
+test('normalizeGuess lowercases and collapses punctuation-like separators', () => {
+  assert.equal(normalizeGuess('  Vile   Vial  '), 'vile vial');
+  assert.equal(normalizeGuess('Idle-Idol'), 'idle idol');
+  assert.equal(normalizeGuess('Crook,   Crook!'), 'crook crook');
+});
+
+test('getAcceptedAnswers derives the canonical answer from answerWords when present', () => {
+  const puzzle = {
+    displayAnswer: 'display only',
+    answerWords: ['vile', 'vial'],
+    aliases: ['vile-vial'],
+  };
+
+  assert.deepEqual(getAcceptedAnswers(puzzle), ['vile vial', 'vile-vial']);
+});
+
+test('isCorrectGuess accepts canonical answers and aliases after normalization', () => {
+  const puzzle = {
+    displayAnswer: 'vile vial',
+    answerWords: ['vile', 'vial'],
+    aliases: ['vile-vial'],
+  };
+
+  assert.equal(isCorrectGuess(puzzle, 'Vile Vial'), true);
+  assert.equal(isCorrectGuess(puzzle, 'vile-vial'), true);
+  assert.equal(isCorrectGuess(puzzle, 'idle idol'), false);
+});
+
+test('getGuessShape distinguishes empty one-word two-word and longer guesses', () => {
+  assert.equal(getGuessShape(''), 'empty');
+  assert.equal(getGuessShape('vile'), 'one-word');
+  assert.equal(getGuessShape('vile vial'), 'two-word');
+  assert.equal(getGuessShape('the vile vial'), 'longer');
+});
+
+test('getPuzzleProgressLabel reports current position for demo next flow', () => {
+  assert.equal(getPuzzleProgressLabel(0, 3), 'Puzzle 1 of 3');
+  assert.equal(getPuzzleProgressLabel(2, 3), 'Puzzle 3 of 3');
+});
