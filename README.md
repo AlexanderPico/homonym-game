@@ -26,24 +26,25 @@ This repository is structured for two horizons:
 
 ## Current prototype
 
-Open this file in a browser:
-- `apps/web/index.html`
+Open these files in a browser:
+- public daily page: `apps/web/index.html`
+- curator view: `apps/web/admin/index.html`
 
 No build step is required for the current prototype.
 
 Current demo behavior:
-- one featured puzzle at a time
+- `/` acts as a single daily puzzle page
+- `/admin/` preserves the browse-and-curate `Next puzzle` workflow
 - typed guesses with no answer-revealing placeholder text
 - typo-aware near-match feedback for guesses that are one misspelling away
 - three-guess limit per puzzle
 - spoiler-safe share glyph summary after solve, fail, or reveal
-- `Next puzzle` rotates through the full 40-puzzle draft set
 - editorial styling aimed at a polished daily-game feel
 
 ## Current content state
 
 - `content/puzzles/starter-puzzles.js` preserves the original 3-puzzle seed set
-- `content/puzzles/draft-40.js` is now the active 40-puzzle corpus for the demo
+- `content/puzzles/draft-40.js` is the active 40-puzzle corpus for both the public daily page and the admin curator view
 - the 40-entry corpus now has revised difficulty assignments, including a real hard tier
 - `docs/content-notes.md` tracks the current shortlist, weak spots, and editorial rules
 
@@ -63,6 +64,18 @@ Best corpus sources appear to be generated rather than copied:
 So the current recommendation is:
 - treat the format as reasonably original in product form
 - build your own curated corpus rather than relying on a huge ready-made public list
+
+## Easiest public deployment right now
+
+For the current static build, the simplest shareable URL path is GitHub Pages.
+
+Suggested setup:
+- push this repo to GitHub
+- enable Pages for the default branch or `docs/`/GitHub Actions static deploy
+- share the published root URL for the daily page
+- use `/admin/` only as the curator route
+
+Because the app is still static, GitHub Pages is the lowest-friction choice for initial user testing.
 
 ## Verification
 

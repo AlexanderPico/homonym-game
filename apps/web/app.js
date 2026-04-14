@@ -8,6 +8,8 @@ const {
   getGuessShape,
   getGuessResult,
   buildShareGlyph,
+  getDailyPuzzleIndex,
+  getAppMode,
 } = globalThis.HomonymGameCore || {};
 
 const MAX_ATTEMPTS = 3;
@@ -32,10 +34,20 @@ const shareCaption = document.getElementById('share-caption');
 const shareText = document.getElementById('share-text');
 const copyShareButton = document.getElementById('copy-share-button');
 
+const appMode = getAppMode ? getAppMode(window.location.pathname) : 'daily';
+
 let currentIndex = 0;
 let solvedCurrentPuzzle = false;
 let revealedCurrentPuzzle = false;
 let attemptResults = [];
+
+function getLocalDateString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
 function titleCase(value) {
   return String(value || '')
@@ -72,9 +84,12 @@ function setStatus(message, tone) {
   statusText.dataset.tone = tone || 'neutral';
 }
 
-function renderSharePanel(puzzle, outcomeLabel) {
+function renderSharePanel(outcomeLabel) {
   const glyphLine = buildShareGlyph(attemptResults, MAX_ATTEMPTS);
-  const header = `Homonym Game ${currentIndex + 1}/${puzzles.length}`;
+  const header =
+    appMode === 'admin'
+      ? `Homonym Game Admin ${currentIndex + 1}/${puzzles.length}`
+      : `Homonym Game ${getLocalDateString()}`;
   shareCaption.textContent = outcomeLabel;
   shareText.textContent = `${header}\n${glyphLine}`;
   sharePanel.hidden = false;
@@ -115,6 +130,22 @@ function updateAttemptUi() {
   attemptGlyphs.textContent = cells.join(' ');
 }
 
+function updateModeChrome() {
+  if (appMode === 'admin') {
+    progressPill.textContent = getPuzzleProgressLabel(currentIndex, puzzles.length);
+    if (nextButton) {
+      nextButton.hidden = false;
+      nextButton.disabled = false;
+    }
+    return;
+  }
+
+  progressPill.textContent = 'Daily puzzle';
+  if (nextButton) {
+    nextButton.hidden = true;
+  }
+}
+
 function loadPuzzle(index) {
   const puzzle = puzzles[index];
   if (!puzzle) {
@@ -123,7 +154,9 @@ function loadPuzzle(index) {
     guessInput.disabled = true;
     checkButton.disabled = true;
     revealButton.disabled = true;
-    nextButton.disabled = true;
+    if (nextButton) {
+      nextButton.disabled = true;
+    }
     return;
   }
 
@@ -131,13 +164,12 @@ function loadPuzzle(index) {
   solvedCurrentPuzzle = false;
   revealedCurrentPuzzle = false;
   attemptResults = [];
-  progressPill.textContent = getPuzzleProgressLabel(index, puzzles.length);
+  updateModeChrome();
   difficultyBadge.textContent = titleCase(puzzle.difficulty || 'prototype');
   clueText.textContent = puzzle.clue;
   guessInput.value = '';
   unlockPuzzleInteraction();
   guessInput.focus();
-  nextButton.disabled = false;
   resultPanel.hidden = true;
   hideSharePanel();
   updateAttemptUi();
@@ -152,7 +184,7 @@ function closePuzzleWithAnswer(puzzle, mode, statusMessage, tone, shareCaptionTe
   showAnswer(puzzle, mode);
   lockPuzzleInteraction();
   setStatus(statusMessage, tone);
-  renderSharePanel(puzzle, shareCaptionText);
+  renderSharePanel(shareCaptionText);
 }
 
 async function copyShareSummary() {
@@ -187,7 +219,7 @@ function handleGuessSubmit(event) {
   const guess = guessInput.value;
 
   if (solvedCurrentPuzzle || revealedCurrentPuzzle) {
-    setStatus('This puzzle is closed. Tap Next puzzle to continue.', 'neutral');
+    setStatus(appMode === 'admin' ? 'This puzzle is closed. Tap Next puzzle to continue.' : 'Today\'s puzzle is closed. Come back tomorrow or share your result.', 'neutral');
     return;
   }
 
@@ -211,7 +243,7 @@ function handleGuessSubmit(event) {
   }
 
   if (attemptResults.length >= MAX_ATTEMPTS) {
-    setStatus('No guesses left. Tap Next puzzle to continue.', 'neutral');
+    setStatus(appMode === 'admin' ? 'No guesses left. Tap Next puzzle to continue.' : 'No guesses left for today. Share your result or come back tomorrow.', 'neutral');
     return;
   }
 
@@ -269,28 +301,42 @@ function handleReveal() {
   closePuzzleWithAnswer(
     puzzle,
     'revealed',
-    'Answer revealed. Use Next puzzle to keep demoing the loop.',
+    appMode === 'admin' ? 'Answer revealed. Use Next puzzle to keep demoing the loop.' : 'Answer revealed. Share your result or come back tomorrow for the next daily clue.',
     'neutral',
     'Revealed',
   );
 }
 
 function handleNextPuzzle() {
+  if (appMode !== 'admin') {
+    return;
+  }
   const nextIndex = (currentIndex + 1) % puzzles.length;
   loadPuzzle(nextIndex);
 }
 
-if (!puzzles.length || !getPuzzleProgressLabel || !getGuessShape || !getGuessResult || !buildShareGlyph) {
+function getInitialPuzzleIndex() {
+  if (appMode === 'admin') {
+    return 0;
+  }
+  return getDailyPuzzleIndex(getLocalDateString(), puzzles.length);
+}
+
+if (!puzzles.length || !getPuzzleProgressLabel || !getGuessShape || !getGuessResult || !buildShareGlyph || !getDailyPuzzleIndex || !getAppMode) {
   clueText.textContent = 'Setup incomplete';
   setStatus('Puzzle data or game logic failed to load.', 'error');
   guessInput.disabled = true;
   checkButton.disabled = true;
   revealButton.disabled = true;
-  nextButton.disabled = true;
+  if (nextButton) {
+    nextButton.disabled = true;
+  }
 } else {
   guessForm.addEventListener('submit', handleGuessSubmit);
   revealButton.addEventListener('click', handleReveal);
-  nextButton.addEventListener('click', handleNextPuzzle);
+  if (nextButton) {
+    nextButton.addEventListener('click', handleNextPuzzle);
+  }
   copyShareButton.addEventListener('click', copyShareSummary);
-  loadPuzzle(0);
+  loadPuzzle(getInitialPuzzleIndex());
 }

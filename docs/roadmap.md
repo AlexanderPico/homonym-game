@@ -7,9 +7,10 @@ Homonym Game is a short-form word puzzle built around clues that resolve into a 
 - a legitimate phrase in ordinary English
 
 Current direction:
-- one polished puzzle on the page at a time
+- `/` is the public daily puzzle page
+- `/admin/` is the curator browse-and-review page
 - typed guesses as the default interaction
-- `Next puzzle` as a demo stand-in for future daily rollover
+- daily selection comes from the curated corpus by date
 - mobile-first
 - visually restrained, editorial, and shareable
 
@@ -19,13 +20,12 @@ Goal:
 - prove that the typed solve loop is legible, fair, and satisfying in a tiny browser demo
 
 Deliverables:
-- simple mobile-friendly web page
-- one featured clue at a time
+- simple mobile-friendly public daily page
+- single featured clue selected by date
+- separate `/admin/` curator page with sequential browsing
 - typed answer checking
 - typo-aware near-match feedback
 - three-guess limit with spoiler-safe share glyphs
-- reveal fallback
-- demo `Next puzzle` flow across the active draft corpus
 - basic explanation of the mechanic
 
 Questions to answer:

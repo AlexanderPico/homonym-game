@@ -3,36 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Homonym Game</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <title>Homonym Game Admin</title>
+    <link rel="stylesheet" href="../styles.css" />
   </head>
   <body>
     <main class="app-shell">
       <header class="masthead">
-        <p class="section-label">Daily puzzle</p>
+        <p class="section-label">Admin</p>
         <div class="masthead-row">
           <h1>Homonym Game</h1>
-          <div id="progress-pill" class="progress-pill" aria-live="polite">Daily puzzle</div>
+          <div id="progress-pill" class="progress-pill" aria-live="polite">Puzzle 1 of 40</div>
         </div>
         <p class="lede">
-          Decode today’s clue into a two-word answer whose words sound right and land as a phrase.
+          Curator mode. Review one puzzle at a time, solve it yourself, then move to the next draft.
         </p>
       </header>
 
       <section class="intro-card" aria-labelledby="how-to-play-title">
         <div>
-          <p class="kicker">How to play</p>
-          <h2 id="how-to-play-title">Three guesses. No spoilers.</h2>
+          <p class="kicker">Curator flow</p>
+          <h2 id="how-to-play-title">Review the clue. Then advance.</h2>
         </div>
         <p>
-          One puzzle per day. Near-miss typos are called out, and your result turns into a shareable glyph
-          line without revealing the answer.
+          This preserves the current browse-and-curate workflow so you can inspect the active 40-puzzle corpus
+          one entry at a time.
         </p>
       </section>
 
       <section class="game-card" aria-labelledby="puzzle-title">
         <div class="card-meta-row">
-          <p class="card-label">Today’s clue</p>
+          <p class="card-label">Current draft clue</p>
           <p id="difficulty-badge" class="difficulty-badge">Easy</p>
         </div>
 
@@ -68,6 +68,9 @@
 
         <div class="action-row">
           <button id="reveal-button" type="button" class="secondary-button">Reveal answer</button>
+          <button id="next-button" type="button" class="secondary-button secondary-button--accent">
+            Next puzzle
+          </button>
         </div>
 
         <section id="result-panel" class="result-panel" aria-live="polite" hidden>
@@ -93,13 +96,13 @@
 
       <footer class="footer-note">
         <p>
-          Want the curator view? Open <code>/admin/</code> to browse and review the draft corpus.
+          Public daily view lives at the site root. Use this page for browsing, curation, and testing the corpus.
         </p>
       </footer>
     </main>
 
-    <script src="../../content/puzzles/draft-40.js"></script>
-    <script src="../../packages/game-core/index.js"></script>
-    <script src="./app.js"></script>
+    <script src="../../../content/puzzles/draft-40.js"></script>
+    <script src="../../../packages/game-core/index.js"></script>
+    <script src="../app.js"></script>
   </body>
 </html>

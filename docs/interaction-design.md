@@ -17,20 +17,18 @@ The player experience should feel like:
 
 ## Prototype interaction choice
 
-For the current prototype, use a single featured puzzle:
-- present one clue at a time
-- let the player type a guess immediately
-- provide a single primary action: Check
-- call out near-miss typos separately from ordinary misses
-- cap each puzzle at three guesses
-- generate a spoiler-safe glyph line for sharing
-- keep Reveal answer as an escape hatch if the player is stuck
-- use Next puzzle to simulate tomorrow's puzzle in the demo
+For the current prototype, split the experience into two routes:
+- `/` shows one date-selected daily puzzle
+- `/admin/` preserves sequential corpus browsing
+- both routes use typed guesses and the same answer-checking rules
+- both routes keep reveal as an escape hatch
+- only `/admin/` exposes `Next puzzle`
 
 Reason:
-- closer to the eventual daily product shape
-- preserves a stronger sense of solving than reveal-only cards
-- lets us learn about answer validation and frustration early
+- public users should experience a true daily ritual rather than a browsing demo
+- curator/admin needs are different from player needs
+- the admin route preserves the current high-value editorial workflow
+- shared guess logic keeps the product behavior consistent across both views
 
 ## Mobile UX principles
 
@@ -76,21 +74,23 @@ Cons:
 
 ## Information architecture for the prototype
 
-Top of page:
+Public `/` page:
 - title
 - short mechanic description
-- lightweight progress context
+- single daily clue card
+- attempts / share state
 
-Main section:
-- single clue card
-- three-attempt tracker
+Admin `/admin/` page:
+- title
+- curator framing copy
+- progress context across the full corpus
+- single clue card with `Next puzzle`
+
+Shared game section:
 - text input
-- check / reveal / next actions
+- check / reveal actions
 - answer explanation after solve or reveal
 - share glyph panel after puzzle closure
-
-Bottom section:
-- note about future daily-play direction
 
 ## Success criteria for this prototype
 
