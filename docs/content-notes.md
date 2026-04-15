@@ -17,7 +17,7 @@ That means:
 - no admin browser page committed publicly
 - no docs that enumerate unpublished clue/answer pairs
 - only a generated one-puzzle public payload may be used for deployment, and that payload should stay out of git as well
-- unpublished corpus and curator-only files should live in the sibling private repo `../homonym-game-private/`
+- unpublished corpus and curator-only files should live outside this public repo
 
 ## Early editorial rules
 
@@ -30,7 +30,7 @@ That means:
 
 ## Current file roles
 
-- sibling private repo `../homonym-game-private/` — unpublished corpus and curator-only assets
+- unpublished corpus and curator-only assets — keep outside this public repo
 - `apps/web/data/today.js` — generated single-puzzle public payload, ignored by git
 - `content/puzzles/README.md` — non-sensitive notes about puzzle file roles
 

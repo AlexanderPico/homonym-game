@@ -21,15 +21,21 @@ jobs:
       - name: Checkout public repo
         uses: actions/checkout@v4
 
-      - name: Checkout private corpus repo
-        uses: actions/checkout@v4
-        with:
-          repository: AlexanderPico/homonym-game-private
-          ref: main
-          path: private-repo
-          ssh-key: ${{ secrets.PRIVATE_REPO_SSH_KEY }}
-          persist-credentials: false
-          fetch-depth: 1
+      - name: Setup SSH key for source checkout
+        env:
+          SOURCE_REPO_SSH_KEY: ${{ secrets.SOURCE_REPO_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SOURCE_REPO_SSH_KEY" > ~/.ssh/source_repo_key
+          chmod 600 ~/.ssh/source_repo_key
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Clone source content repo
+        env:
+          SOURCE_REPO_URL: ${{ secrets.SOURCE_REPO_URL }}
+        run: |
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/source_repo_key -o IdentitiesOnly=yes" \
+            git clone --depth 1 "$SOURCE_REPO_URL" private-repo
 
       - name: Setup Node
         uses: actions/setup-node@v4

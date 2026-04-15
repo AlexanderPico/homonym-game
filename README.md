@@ -38,11 +38,10 @@ Current demo behavior:
 
 ## Current content state
 
-- private unpublished corpus and curator-only files now live in the sibling private repo:
-  - `../homonym-game-private/`
+- unpublished corpus and curator-only files should live outside this public repo
 - this public repo only generates and serves one daily payload at a time
 - `apps/web/data/today.js` is a generated local/public payload containing exactly one puzzle and is ignored by git
-- `docs/content-notes.md` tracks editorial rules and file roles without exposing the private full draft file
+- `docs/content-notes.md` tracks editorial rules and file roles without exposing private corpus details
 
 ## Reality check
 
@@ -67,8 +66,10 @@ For the current static build, the simplest shareable URL path is GitHub Pages.
 
 Suggested setup:
 - keep this public repo as the Pages/deploy repo
-- keep unpublished corpus + curator files in the sibling private repo `../homonym-game-private/`
-- add a GitHub Actions secret named `PRIVATE_REPO_SSH_KEY` containing a read-only deploy key for the private repo
+- keep unpublished corpus + curator files in a separate non-public source repo
+- add two GitHub Actions secrets in the public repo:
+  - `SOURCE_REPO_URL`
+  - `SOURCE_REPO_SSH_KEY`
 - the included Pages workflow will generate `today.js` during deployment
 - share the published root URL for the daily page
 

@@ -14,6 +14,9 @@ coverage/
 # Hermes local planning artifacts
 .hermes/
 
+# Local agent/operator notes
+AGENT_README.local.md
+
 # Private/local-only assets
 content/
 apps/web/admin/
