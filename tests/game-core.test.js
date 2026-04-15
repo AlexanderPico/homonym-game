@@ -85,6 +85,12 @@ test('getRouteConfig distinguishes locale and mode', () => {
   assert.deepEqual(getRouteConfig('/jp/index.html'), { locale: 'jp', mode: 'daily' });
   assert.deepEqual(getRouteConfig('/jp/admin'), { locale: 'jp', mode: 'admin' });
   assert.deepEqual(getRouteConfig('/jp/admin/index.html'), { locale: 'jp', mode: 'admin' });
+  assert.deepEqual(getRouteConfig('/homonym-game/'), { locale: 'en', mode: 'daily' });
+  assert.deepEqual(getRouteConfig('/homonym-game/index.html'), { locale: 'en', mode: 'daily' });
+  assert.deepEqual(getRouteConfig('/homonym-game/jp/'), { locale: 'jp', mode: 'daily' });
+  assert.deepEqual(getRouteConfig('/homonym-game/jp/index.html'), { locale: 'jp', mode: 'daily' });
+  assert.deepEqual(getRouteConfig('/homonym-game/admin/'), { locale: 'en', mode: 'admin' });
+  assert.deepEqual(getRouteConfig('/homonym-game/jp/admin/'), { locale: 'jp', mode: 'admin' });
 });
 
 test('getPuzzleSetForMode uses locale-specific public puzzle for daily mode and locale corpus for admin', () => {

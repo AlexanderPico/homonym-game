@@ -129,10 +129,10 @@
 
   function getRouteConfig(pathname) {
     const normalized = String(pathname || '/').replace(/\/+$/, '') || '/';
-    const isJapanese = normalized === '/jp' || normalized.startsWith('/jp/');
-    const locale = isJapanese ? 'jp' : 'en';
-    const adminSuffix = isJapanese ? '/jp/admin' : '/admin';
-    const mode = normalized === adminSuffix || normalized.endsWith(`${adminSuffix}/index.html`) ? 'admin' : 'daily';
+    const parts = normalized.split('/').filter(Boolean);
+    const locale = parts.includes('jp') ? 'jp' : 'en';
+    const lastPart = parts[parts.length - 1] || '';
+    const mode = lastPart === 'admin' || parts.includes('admin') ? 'admin' : 'daily';
     return { locale, mode };
   }
 
