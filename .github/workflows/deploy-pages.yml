@@ -25,9 +25,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: AlexanderPico/homonym-game-private
+          ref: main
           path: private-repo
           ssh-key: ${{ secrets.PRIVATE_REPO_SSH_KEY }}
           persist-credentials: false
+          fetch-depth: 1
 
       - name: Setup Node
         uses: actions/setup-node@v4
