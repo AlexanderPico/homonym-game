@@ -11,9 +11,6 @@ coverage/
 *.swp
 *.tmp
 
-# Hermes local planning artifacts
-.hermes/
-
 # Local agent/operator notes
 AGENT_README.local.md
 

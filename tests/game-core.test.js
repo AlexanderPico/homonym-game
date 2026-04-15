@@ -94,19 +94,65 @@ test('getRouteConfig distinguishes locale and mode', () => {
   assert.deepEqual(getRouteConfig('/homonym-game/jp/admin/'), { locale: 'jp', mode: 'admin' });
 });
 
-test('getPuzzleSetForMode uses locale-specific public puzzle for daily mode and locale corpus for admin', () => {
-  const privateCorpusByLocale = {
-    en: [{ id: 'en-1' }],
-    jp: [{ id: 'jp-1' }, { id: 'jp-2' }],
+test('getPuzzleSetForMode uses locale-specific public puzzle for daily mode and draft corpus for admin by default', () => {
+  const draftCorpusByLocale = {
+    en: [{ id: 'en-draft-1' }],
+    jp: [{ id: 'jp-draft-1' }, { id: 'jp-draft-2' }],
+  };
+  const curatedCorpusByLocale = {
+    en: [{ id: 'en-curated-1' }],
+    jp: [{ id: 'jp-curated-1' }],
+  };
+  const rejectedCorpusByLocale = {
+    en: [{ id: 'en-rejected-1' }],
+    jp: [{ id: 'jp-rejected-1' }],
   };
   const publicPuzzleByLocale = {
     en: { id: 'public-en' },
     jp: { id: 'public-jp' },
   };
 
-  assert.deepEqual(getPuzzleSetForMode({ locale: 'en', mode: 'daily' }, { publicPuzzleByLocale, privateCorpusByLocale }), [{ id: 'public-en' }]);
-  assert.deepEqual(getPuzzleSetForMode({ locale: 'jp', mode: 'daily' }, { publicPuzzleByLocale, privateCorpusByLocale }), [{ id: 'public-jp' }]);
-  assert.deepEqual(getPuzzleSetForMode({ locale: 'jp', mode: 'admin' }, { publicPuzzleByLocale, privateCorpusByLocale }), [{ id: 'jp-1' }, { id: 'jp-2' }]);
+  assert.deepEqual(
+    getPuzzleSetForMode({ locale: 'en', mode: 'daily' }, { publicPuzzleByLocale, draftCorpusByLocale, curatedCorpusByLocale, rejectedCorpusByLocale }),
+    [{ id: 'public-en' }],
+  );
+  assert.deepEqual(
+    getPuzzleSetForMode({ locale: 'jp', mode: 'daily' }, { publicPuzzleByLocale, draftCorpusByLocale, curatedCorpusByLocale, rejectedCorpusByLocale }),
+    [{ id: 'public-jp' }],
+  );
+  assert.deepEqual(
+    getPuzzleSetForMode({ locale: 'jp', mode: 'admin' }, { publicPuzzleByLocale, draftCorpusByLocale, curatedCorpusByLocale, rejectedCorpusByLocale }),
+    [{ id: 'jp-draft-1' }, { id: 'jp-draft-2' }],
+  );
+});
+
+test('getPuzzleSetForMode lets admin switch between draft curated and rejected corpora', () => {
+  const draftCorpusByLocale = {
+    en: [{ id: 'en-draft-1' }],
+  };
+  const curatedCorpusByLocale = {
+    en: [{ id: 'en-curated-1' }, { id: 'en-curated-2' }],
+  };
+  const rejectedCorpusByLocale = {
+    en: [{ id: 'en-rejected-1' }],
+  };
+
+  assert.deepEqual(
+    getPuzzleSetForMode({ locale: 'en', mode: 'admin', adminSource: 'drafts' }, { draftCorpusByLocale, curatedCorpusByLocale, rejectedCorpusByLocale }),
+    [{ id: 'en-draft-1' }],
+  );
+  assert.deepEqual(
+    getPuzzleSetForMode({ locale: 'en', mode: 'admin', adminSource: 'curated' }, { draftCorpusByLocale, curatedCorpusByLocale, rejectedCorpusByLocale }),
+    [{ id: 'en-curated-1' }, { id: 'en-curated-2' }],
+  );
+  assert.deepEqual(
+    getPuzzleSetForMode({ locale: 'en', mode: 'admin', adminSource: 'rejected' }, { draftCorpusByLocale, curatedCorpusByLocale, rejectedCorpusByLocale }),
+    [{ id: 'en-rejected-1' }],
+  );
+  assert.deepEqual(
+    getPuzzleSetForMode({ locale: 'en', mode: 'admin', adminSource: 'bogus' }, { draftCorpusByLocale, curatedCorpusByLocale, rejectedCorpusByLocale }),
+    [{ id: 'en-draft-1' }],
+  );
 });
 
 test('selectPublicPuzzle uses manual offset on top of daily auto rotation', () => {
@@ -120,4 +166,5 @@ test('selectPublicPuzzle uses manual offset on top of daily auto rotation', () =
 test('getPuzzleProgressLabel reports current position for demo next flow', () => {
   assert.equal(getPuzzleProgressLabel(0, 3), 'Puzzle 1 of 3');
   assert.equal(getPuzzleProgressLabel(2, 3), 'Puzzle 3 of 3');
+  assert.equal(getPuzzleProgressLabel(0, 0), 'No puzzles');
 });

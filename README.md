@@ -40,7 +40,13 @@ Current demo behavior:
 ## Current content state
 
 - unpublished corpus and curator-only files should live outside this public repo
-- this public repo only generates and serves one daily payload at a time per locale
+- the private source repo now separates curated sets from incoming drafts per locale:
+  - `content/puzzles/en-puzzles.js`
+  - `content/puzzles/jp-puzzles.js`
+  - `content/puzzles/en-drafts.js`
+  - `content/puzzles/jp-drafts.js`
+- public daily generation should read from the curated `*-puzzles.js` files only
+- local admin curation should read from the draft `*-drafts.js` files by default
 - `apps/web/data/today.js` is the generated English daily payload and is ignored by git
 - `apps/web/jp/data/today-jp.js` is the generated Japanese daily payload and is ignored by git
 - `docs/content-notes.md` tracks editorial rules and file roles without exposing private corpus details

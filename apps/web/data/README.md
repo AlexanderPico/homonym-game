@@ -6,6 +6,6 @@ Files:
 
 Notes:
 - both generated payloads are ignored by git and must never be committed to the public repo
-- generate them from the source corpus with:
+- generate them from the curated source corpora (`en-puzzles.js` / `jp-puzzles.js`) with:
   - `node scripts/build-public-daily.js`
   - or `node scripts/build-public-daily.js YYYY-MM-DD`

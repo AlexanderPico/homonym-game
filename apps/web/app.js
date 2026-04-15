@@ -10,15 +10,41 @@ const {
 const route = getRouteConfig ? getRouteConfig(window.location.pathname) : { locale: 'en', mode: 'daily' };
 const appMode = route.mode;
 const locale = route.locale;
+const ADMIN_SOURCE_OPTIONS = ['drafts', 'curated', 'rejected'];
+
+function getStoredAdminSource() {
+  if (appMode !== 'admin') return 'drafts';
+  const searchSource = new URLSearchParams(window.location.search).get('source');
+  if (ADMIN_SOURCE_OPTIONS.includes(searchSource)) {
+    return searchSource;
+  }
+  try {
+    const stored = window.localStorage.getItem(`homonym-admin-source:${locale}`);
+    if (ADMIN_SOURCE_OPTIONS.includes(stored)) {
+      return stored;
+    }
+  } catch (error) {}
+  return 'drafts';
+}
+
+const adminSource = getStoredAdminSource();
 const puzzles = getPuzzleSetForMode
-  ? getPuzzleSetForMode(route, {
+  ? getPuzzleSetForMode({ ...route, adminSource }, {
       publicPuzzleByLocale: {
         en: globalThis.HOMONYM_TODAY_PUZZLE || null,
         jp: globalThis.HOMONYM_TODAY_PUZZLE_JP || null,
       },
-      privateCorpusByLocale: {
-        en: Array.isArray(globalThis.HOMONYM_DRAFT_PUZZLES) ? globalThis.HOMONYM_DRAFT_PUZZLES : [],
+      draftCorpusByLocale: {
+        en: Array.isArray(globalThis.HOMONYM_EN_DRAFT_PUZZLES) ? globalThis.HOMONYM_EN_DRAFT_PUZZLES : [],
         jp: Array.isArray(globalThis.HOMONYM_JP_DRAFT_PUZZLES) ? globalThis.HOMONYM_JP_DRAFT_PUZZLES : [],
+      },
+      curatedCorpusByLocale: {
+        en: Array.isArray(globalThis.HOMONYM_EN_PUZZLES) ? globalThis.HOMONYM_EN_PUZZLES : [],
+        jp: Array.isArray(globalThis.HOMONYM_JP_PUZZLES) ? globalThis.HOMONYM_JP_PUZZLES : [],
+      },
+      rejectedCorpusByLocale: {
+        en: Array.isArray(globalThis.HOMONYM_EN_REJECTED_PUZZLES) ? globalThis.HOMONYM_EN_REJECTED_PUZZLES : [],
+        jp: Array.isArray(globalThis.HOMONYM_JP_REJECTED_PUZZLES) ? globalThis.HOMONYM_JP_REJECTED_PUZZLES : [],
       },
     })
   : [];
@@ -52,6 +78,27 @@ const STRINGS = {
     copyDone: 'Copied',
     shareDefault: 'Spoiler-safe summary',
     attemptsLeft: (n) => `${n} guess${n === 1 ? '' : 'es'} left`,
+    sourceLabel: 'Puzzle source',
+    sourceDrafts: 'Drafts',
+    sourceCurated: 'Curated',
+    sourceRejected: 'Rejected',
+    cardLabelBySource: {
+      drafts: 'Current draft clue',
+      curated: 'Current curated clue',
+      rejected: 'Current rejected clue',
+    },
+    noPuzzlesBySource: {
+      drafts: 'No draft puzzles loaded.',
+      curated: 'No curated puzzles loaded.',
+      rejected: 'No rejected puzzles loaded.',
+    },
+    moderationReady: 'Draft mode only',
+    moderationDisabledBySource: 'Switch back to Drafts to queue decisions.',
+    moderationMissingHelper: 'Local moderation helper unavailable. Run node scripts/moderation-helper-server.js.',
+    moderationQueued: (decision, queueLength) => `${decision} queued. Queue length: ${queueLength}.`,
+    moderationApprove: 'Approved',
+    moderationReject: 'Rejected',
+    moderationSkip: 'Skipped',
   },
   jp: {
     dailyPill: '今日のパズル',
@@ -81,6 +128,27 @@ const STRINGS = {
     copyDone: 'コピー済み',
     shareDefault: 'ネタバレなし',
     attemptsLeft: (n) => `残り ${n} 回`,
+    sourceLabel: '表示するセット',
+    sourceDrafts: '下書き',
+    sourceCurated: '承認済み',
+    sourceRejected: '却下',
+    cardLabelBySource: {
+      drafts: '現在の下書きヒント',
+      curated: '現在の承認済みヒント',
+      rejected: '現在の却下ヒント',
+    },
+    noPuzzlesBySource: {
+      drafts: '下書きパズルがありません。',
+      curated: '承認済みパズルがありません。',
+      rejected: '却下済みパズルがありません。',
+    },
+    moderationReady: '下書きモードのみ',
+    moderationDisabledBySource: '判定を送るには下書き表示に戻してください。',
+    moderationMissingHelper: 'ローカル審査ヘルパーが見つかりません。node scripts/moderation-helper-server.js を実行してください。',
+    moderationQueued: (decision, queueLength) => `${decision}をキューに追加しました。件数: ${queueLength}`,
+    moderationApprove: '承認',
+    moderationReject: '却下',
+    moderationSkip: '保留',
   },
 };
 
@@ -90,6 +158,9 @@ const MAX_ATTEMPTS = 3;
 
 const progressPill = document.getElementById('progress-pill');
 const difficultyBadge = document.getElementById('difficulty-badge');
+const cardLabel = document.getElementById('card-label');
+const sourceSelect = document.getElementById('source-select');
+const sourceLabel = document.getElementById('source-label');
 const clueText = document.getElementById('puzzle-title');
 const statusText = document.getElementById('status-text');
 const guessForm = document.getElementById('guess-form');
@@ -98,6 +169,12 @@ const checkButton = document.getElementById('check-button');
 const revealButton = document.getElementById('reveal-button');
 const nextButton = document.getElementById('next-button');
 const resultPanel = document.getElementById('result-panel');
+const moderationPanel = document.getElementById('moderation-panel');
+const moderationStatus = document.getElementById('moderation-status');
+const reviewNoteInput = document.getElementById('review-note');
+const approveButton = document.getElementById('approve-button');
+const rejectButton = document.getElementById('reject-button');
+const skipButton = document.getElementById('skip-button');
 const answerText = document.getElementById('answer-text');
 const explanationList = document.getElementById('explanation-list');
 const notesText = document.getElementById('notes-text');
@@ -127,6 +204,79 @@ function titleCase(value) {
     .filter(Boolean)
     .map((part) => part[0].toUpperCase() + part.slice(1))
     .join(' ');
+}
+
+function getSourceLabelFor(source) {
+  return ui.cardLabelBySource?.[source] || ui.cardLabelBySource?.drafts || '';
+}
+
+function getNoPuzzlesMessageFor(source) {
+  return ui.noPuzzlesBySource?.[source] || ui.noPuzzlesBySource?.drafts || (locale === 'jp' ? 'パズルデータが見つかりません。' : 'Puzzle data is missing.');
+}
+
+function configureAdminSourceUi() {
+  if (appMode !== 'admin' || !sourceSelect || !sourceLabel) return;
+  sourceLabel.textContent = ui.sourceLabel;
+  const options = [
+    { value: 'drafts', label: ui.sourceDrafts },
+    { value: 'curated', label: ui.sourceCurated },
+    { value: 'rejected', label: ui.sourceRejected },
+  ];
+  sourceSelect.replaceChildren();
+  options.forEach(({ value, label }) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    if (value === adminSource) option.selected = true;
+    sourceSelect.appendChild(option);
+  });
+}
+
+function updateAdminSourceUi() {
+  if (appMode !== 'admin') return;
+  if (cardLabel) {
+    cardLabel.textContent = getSourceLabelFor(adminSource);
+  }
+  if (sourceSelect) {
+    sourceSelect.value = adminSource;
+  }
+}
+
+function persistAdminSource(nextSource) {
+  if (!ADMIN_SOURCE_OPTIONS.includes(nextSource)) return;
+  try {
+    window.localStorage.setItem(`homonym-admin-source:${locale}`, nextSource);
+  } catch (error) {}
+  const url = new URL(window.location.href);
+  if (nextSource === 'drafts') {
+    url.searchParams.delete('source');
+  } else {
+    url.searchParams.set('source', nextSource);
+  }
+  window.location.href = url.toString();
+}
+
+function setModerationStatus(message, tone = 'neutral') {
+  if (!moderationStatus) return;
+  moderationStatus.textContent = message;
+  moderationStatus.dataset.tone = tone;
+}
+
+function setModerationButtonsDisabled(disabled) {
+  [approveButton, rejectButton, skipButton, reviewNoteInput].forEach((element) => {
+    if (element) element.disabled = disabled;
+  });
+}
+
+function updateModerationUi() {
+  if (!moderationPanel) return;
+  const enabled = appMode === 'admin' && adminSource === 'drafts' && Boolean(puzzles[currentIndex]);
+  setModerationButtonsDisabled(!enabled);
+  if (enabled) {
+    setModerationStatus(ui.moderationReady, 'neutral');
+    return;
+  }
+  setModerationStatus(ui.moderationDisabledBySource, 'warning');
 }
 
 function renderExplanation(lines) {
@@ -200,14 +350,18 @@ function updateModeChrome() {
 }
 
 function loadPuzzle(index) {
+  currentIndex = index;
   const puzzle = puzzles[index];
+  updateAdminSourceUi();
+  updateModeChrome();
   if (!puzzle) {
     clueText.textContent = locale === 'jp' ? 'パズルが読み込めません' : 'No puzzle loaded';
-    setStatus(locale === 'jp' ? 'パズルデータが見つかりません。' : 'Puzzle data is missing.', 'error');
+    setStatus(getNoPuzzlesMessageFor(adminSource), 'error');
     guessInput.disabled = true;
     checkButton.disabled = true;
     revealButton.disabled = true;
     if (nextButton) nextButton.disabled = true;
+    updateModerationUi();
     return;
   }
   currentIndex = index;
@@ -224,6 +378,7 @@ function loadPuzzle(index) {
   hideSharePanel();
   updateAttemptUi();
   setStatus(ui.typePrompt, 'neutral');
+  updateModerationUi();
 }
 
 function closePuzzleWithAnswer(puzzle, mode, statusMessage, tone, shareCaptionText) {
@@ -322,7 +477,53 @@ function handleNextPuzzle() {
   loadPuzzle(nextIndex);
 }
 
-if (!puzzles.length || !getPuzzleProgressLabel || !getGuessShape || !getGuessResult || !buildShareGlyph || !getRouteConfig || !getPuzzleSetForMode) {
+async function queueModerationDecision(decision) {
+  const puzzle = puzzles[currentIndex];
+  if (appMode !== 'admin' || adminSource !== 'drafts' || !puzzle) {
+    setModerationStatus(ui.moderationDisabledBySource, 'warning');
+    return;
+  }
+
+  const note = reviewNoteInput ? reviewNoteInput.value.trim() : '';
+  setModerationButtonsDisabled(true);
+  setModerationStatus(`${decision}…`, 'neutral');
+
+  try {
+    const response = await fetch('http://127.0.0.1:8765/queue', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: puzzle.id,
+        locale,
+        source_set: 'drafts',
+        decision,
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: 'alex',
+        review_notes: note,
+        clue: puzzle.clue,
+        displayAnswer: puzzle.displayAnswer,
+      }),
+    });
+    const payload = await response.json();
+    if (!response.ok || !payload.ok) {
+      throw new Error(payload.error || `Request failed: ${response.status}`);
+    }
+    const label = decision === 'approve' ? ui.moderationApprove : decision === 'reject' ? ui.moderationReject : ui.moderationSkip;
+    setModerationStatus(ui.moderationQueued(label, payload.queueLength), 'success');
+    if (reviewNoteInput) {
+      reviewNoteInput.value = '';
+    }
+    handleNextPuzzle();
+  } catch (error) {
+    const helperHint = /fetch|Failed to fetch|NetworkError/i.test(String(error && error.message)) ? ` ${ui.moderationMissingHelper}` : '';
+    setModerationStatus(`${error.message || String(error)}${helperHint}`, 'error');
+    updateModerationUi();
+  }
+}
+
+if (!getPuzzleProgressLabel || !getGuessShape || !getGuessResult || !buildShareGlyph || !getRouteConfig || !getPuzzleSetForMode) {
+  configureAdminSourceUi();
+  updateAdminSourceUi();
   clueText.textContent = locale === 'jp' ? '設定エラー' : 'Setup incomplete';
   setStatus(locale === 'jp' ? 'パズルデータまたはロジックの読み込みに失敗しました。' : 'Puzzle data or game logic failed to load.', 'error');
   guessInput.disabled = true;
@@ -330,9 +531,16 @@ if (!puzzles.length || !getPuzzleProgressLabel || !getGuessShape || !getGuessRes
   revealButton.disabled = true;
   if (nextButton) nextButton.disabled = true;
 } else {
+  configureAdminSourceUi();
   guessForm.addEventListener('submit', handleGuessSubmit);
   revealButton.addEventListener('click', handleReveal);
   if (nextButton) nextButton.addEventListener('click', handleNextPuzzle);
+  if (sourceSelect) {
+    sourceSelect.addEventListener('change', (event) => persistAdminSource(event.target.value));
+  }
+  if (approveButton) approveButton.addEventListener('click', () => queueModerationDecision('approve'));
+  if (rejectButton) rejectButton.addEventListener('click', () => queueModerationDecision('reject'));
+  if (skipButton) skipButton.addEventListener('click', () => queueModerationDecision('skip'));
   copyShareButton.addEventListener('click', copyShareSummary);
   loadPuzzle(0);
 }

@@ -106,6 +106,9 @@
   }
 
   function getPuzzleProgressLabel(index, total) {
+    if (!total || total < 1) {
+      return 'No puzzles';
+    }
     return `Puzzle ${index + 1} of ${total}`;
   }
 
@@ -143,13 +146,24 @@
   function getPuzzleSetForMode(route, sources) {
     const locale = route?.locale || 'en';
     const mode = route?.mode || 'daily';
-    const privateCorpusByLocale = sources?.privateCorpusByLocale || {};
+    const adminSource = route?.adminSource;
+    const draftCorpusByLocale = sources?.draftCorpusByLocale || {};
+    const curatedCorpusByLocale = sources?.curatedCorpusByLocale || {};
+    const rejectedCorpusByLocale = sources?.rejectedCorpusByLocale || {};
     const publicPuzzleByLocale = sources?.publicPuzzleByLocale || {};
-    const privateCorpus = Array.isArray(privateCorpusByLocale[locale]) ? privateCorpusByLocale[locale] : [];
+    const draftCorpus = Array.isArray(draftCorpusByLocale[locale]) ? draftCorpusByLocale[locale] : [];
+    const curatedCorpus = Array.isArray(curatedCorpusByLocale[locale]) ? curatedCorpusByLocale[locale] : [];
+    const rejectedCorpus = Array.isArray(rejectedCorpusByLocale[locale]) ? rejectedCorpusByLocale[locale] : [];
     const publicPuzzle = publicPuzzleByLocale[locale] || null;
 
     if (mode === 'admin') {
-      return privateCorpus;
+      if (adminSource === 'curated') {
+        return curatedCorpus;
+      }
+      if (adminSource === 'rejected') {
+        return rejectedCorpus;
+      }
+      return draftCorpus;
     }
 
     return publicPuzzle ? [publicPuzzle] : [];

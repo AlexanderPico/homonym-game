@@ -31,7 +31,7 @@ function resolvePrivateCorpusPath(locale) {
 
   const sourceRoot = resolveSourceRoot();
   if (sourceRoot) {
-    const corpusFile = locale === 'jp' ? 'jp-draft.js' : 'draft-40.js';
+    const corpusFile = locale === 'jp' ? 'jp-puzzles.js' : 'en-puzzles.js';
     const repoCorpus = path.join(sourceRoot, 'content', 'puzzles', corpusFile);
     if (fs.existsSync(repoCorpus) && fs.statSync(repoCorpus).isFile()) {
       return repoCorpus;
@@ -74,7 +74,7 @@ function loadPublishOverride(publishConfigPath) {
 }
 
 function buildLocale(locale, options) {
-  const globalName = locale === 'jp' ? 'HOMONYM_JP_DRAFT_PUZZLES' : 'HOMONYM_DRAFT_PUZZLES';
+  const globalName = locale === 'jp' ? 'HOMONYM_JP_PUZZLES' : 'HOMONYM_EN_PUZZLES';
   const outputDir = locale === 'jp' ? path.join(repoRoot, 'apps', 'web', 'jp', 'data') : path.join(repoRoot, 'apps', 'web', 'data');
   const outputFile = locale === 'jp' ? 'today-jp.js' : 'today.js';
   const globalOutputName = locale === 'jp' ? 'HOMONYM_TODAY_PUZZLE_JP' : 'HOMONYM_TODAY_PUZZLE';

@@ -32,8 +32,11 @@ That means:
 ## Current file roles
 
 - unpublished corpus and curator-only assets — keep outside this public repo
-- `apps/web/data/today.js` — generated single-puzzle public payload, ignored by git
-- `apps/web/jp/data/today-jp.js` — generated Japanese single-puzzle public payload, ignored by git
+- private source repo curated sets — `content/puzzles/en-puzzles.js` and `content/puzzles/jp-puzzles.js`
+- private source repo incoming drafts — `content/puzzles/en-drafts.js` and `content/puzzles/jp-drafts.js`
+- optional future archive for rejected submissions — `content/puzzles/en-rejected.js` and `content/puzzles/jp-rejected.js`
+- `apps/web/data/today.js` — generated single-puzzle public payload from curated English puzzles, ignored by git
+- `apps/web/jp/data/today-jp.js` — generated Japanese single-puzzle public payload from curated Japanese puzzles, ignored by git
 - local source pointer file — `.local/source-repo-path.txt`, ignored by git
 
 ## Current prototype schema
