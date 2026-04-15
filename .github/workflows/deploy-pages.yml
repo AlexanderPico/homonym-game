@@ -26,9 +26,10 @@ jobs:
           SOURCE_REPO_SSH_KEY: ${{ secrets.SOURCE_REPO_SSH_KEY }}
         run: |
           mkdir -p ~/.ssh
-          printf '%s\n' "$SOURCE_REPO_SSH_KEY" > ~/.ssh/source_repo_key
+          printf '%s' "$SOURCE_REPO_SSH_KEY" | tr -d '\r' > ~/.ssh/source_repo_key
           chmod 600 ~/.ssh/source_repo_key
           ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-keygen -y -f ~/.ssh/source_repo_key >/dev/null
 
       - name: Clone source content repo
         env:
