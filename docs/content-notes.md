@@ -18,6 +18,7 @@ That means:
 - no docs that enumerate unpublished clue/answer pairs
 - only a generated one-puzzle public payload may be used for deployment, and that payload should stay out of git as well
 - unpublished corpus and curator-only files should live outside this public repo
+- local source checkout hints belong in ignored local notes or ignored flatfiles only
 
 ## Early editorial rules
 

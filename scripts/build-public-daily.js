@@ -5,8 +5,33 @@ const { getDailyPuzzleIndex } = require('../packages/game-core/index.js');
 
 const repoRoot = path.resolve(__dirname, '..');
 const envPrivateCorpusPath = process.env.PRIVATE_CORPUS_PATH;
+const localSourcePathFile = path.join(repoRoot, 'content', 'private', 'source-repo-path.txt');
 const localPrivateCorpusPath = path.join(repoRoot, 'content', 'private', 'daily-corpus.js');
-const privateCorpusPath = envPrivateCorpusPath || localPrivateCorpusPath;
+
+function resolvePrivateCorpusPath() {
+  if (envPrivateCorpusPath) {
+    return envPrivateCorpusPath;
+  }
+
+  if (fs.existsSync(localSourcePathFile)) {
+    const pointedPath = fs.readFileSync(localSourcePathFile, 'utf8').trim();
+    if (pointedPath) {
+      const resolved = path.resolve(repoRoot, pointedPath);
+      const asFile = resolved;
+      const asRepoCorpus = path.join(resolved, 'content', 'puzzles', 'draft-40.js');
+      if (fs.existsSync(asFile) && fs.statSync(asFile).isFile()) {
+        return asFile;
+      }
+      if (fs.existsSync(asRepoCorpus) && fs.statSync(asRepoCorpus).isFile()) {
+        return asRepoCorpus;
+      }
+    }
+  }
+
+  return localPrivateCorpusPath;
+}
+
+const privateCorpusPath = resolvePrivateCorpusPath();
 const outputDir = path.join(repoRoot, 'apps', 'web', 'data');
 const outputPath = path.join(outputDir, 'today.js');
 
