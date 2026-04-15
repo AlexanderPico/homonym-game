@@ -155,19 +155,22 @@
     return publicPuzzle ? [publicPuzzle] : [];
   }
 
-  function selectPublicPuzzle(corpus, dateString, overrideId) {
+  function getRotatedPuzzleIndex(dateString, total, offset = 0) {
+    if (!total || total < 1) {
+      return 0;
+    }
+    const base = getDailyPuzzleIndex(dateString, total);
+    const normalizedOffset = Number.isFinite(offset) ? offset : 0;
+    return (base + normalizedOffset + total) % total;
+  }
+
+  function selectPublicPuzzle(corpus, dateString, publishConfig) {
     if (!Array.isArray(corpus) || !corpus.length) {
       return null;
     }
 
-    if (overrideId) {
-      const overridePuzzle = corpus.find((puzzle) => puzzle && puzzle.id === overrideId);
-      if (overridePuzzle) {
-        return overridePuzzle;
-      }
-    }
-
-    return corpus[getDailyPuzzleIndex(dateString, corpus.length)] || null;
+    const offset = publishConfig && Number.isFinite(publishConfig.offset) ? publishConfig.offset : 0;
+    return corpus[getRotatedPuzzleIndex(dateString, corpus.length, offset)] || null;
   }
 
   function buildShareGlyph(results, maxAttempts) {
@@ -198,6 +201,7 @@
     getRouteConfig,
     getAppMode,
     getPuzzleSetForMode,
+    getRotatedPuzzleIndex,
     selectPublicPuzzle,
     buildShareGlyph,
   };

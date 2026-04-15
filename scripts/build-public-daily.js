@@ -59,17 +59,18 @@ function loadCorpus(corpusPath, globalName) {
 
 function loadPublishOverride(publishConfigPath) {
   if (!fs.existsSync(publishConfigPath)) {
-    return null;
+    return { mode: 'auto', offset: 0 };
   }
   try {
     const config = JSON.parse(fs.readFileSync(publishConfigPath, 'utf8'));
-    if (config && config.mode === 'manual' && typeof config.puzzle_id === 'string' && config.puzzle_id.trim()) {
-      return config.puzzle_id.trim();
-    }
+    return {
+      mode: config && typeof config.mode === 'string' ? config.mode : 'auto',
+      offset: config && Number.isFinite(config.offset) ? config.offset : 0,
+    };
   } catch (error) {
     console.warn(`Ignoring unreadable publish config: ${publishConfigPath}`);
   }
-  return null;
+  return { mode: 'auto', offset: 0 };
 }
 
 function buildLocale(locale, options) {
@@ -84,15 +85,16 @@ function buildLocale(locale, options) {
   }
 
   const corpus = loadCorpus(corpusPath, globalName);
-  const publishOverride = loadPublishOverride(publishConfigPathFor(corpusPath, locale));
-  const puzzle = selectPublicPuzzle(corpus, options.dateString, publishOverride);
+  const publishConfig = loadPublishOverride(publishConfigPathFor(corpusPath, locale));
+  const puzzle = selectPublicPuzzle(corpus, options.dateString, publishConfig);
 
   fs.mkdirSync(outputDir, { recursive: true });
   const payload = `(function (root) {\n  root.${globalOutputName} = ${JSON.stringify(puzzle, null, 2)};\n})(typeof globalThis !== 'undefined' ? globalThis : this);\n`;
   fs.writeFileSync(path.join(outputDir, outputFile), payload);
 
   console.log(`[${locale}] corpus: ${corpusPath}`);
-  console.log(`[${locale}] override puzzle id: ${publishOverride || '<none>'}`);
+  console.log(`[${locale}] publish mode: ${publishConfig.mode}`);
+  console.log(`[${locale}] publish offset: ${publishConfig.offset}`);
   console.log(`[${locale}] published puzzle id: ${puzzle.id}`);
 }
 
