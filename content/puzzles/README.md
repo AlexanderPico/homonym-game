@@ -1,21 +1,12 @@
 This directory holds puzzle data and editorial assets.
 
-Current contents:
-- `starter-puzzles.js` — original locally loadable seed corpus for the web demo
-- `draft-40.js` — active 40-puzzle draft corpus used by the current prototype
+Current public-safe contents:
+- `README.md` — explains how private/local puzzle data is handled
 
-Current puzzle record fields:
-- `id`
-- `clue`
-- `displayAnswer`
-- `answerWords`
-- `aliases`
-- `explanation`
-- `difficulty`
-- `status`
-- `notes`
+Private/local files expected here but ignored by git:
+- `draft-40.js` — full unpublished corpus used for local curation
 
-Why JS instead of JSON right now:
-- the prototype must open directly from the filesystem without a build step
-- browser `fetch()` on local JSON is less reliable under `file://`
-- this can later convert to JSON once the app has a dev/build pipeline
+Notes:
+- the public repo should not contain the active unpublished puzzle corpus
+- generate a single public daily payload into `apps/web/data/today.js` instead
+- use `node scripts/build-public-daily.js` to export the current daily puzzle from the private corpus

@@ -1,20 +1,19 @@
-const puzzles = Array.isArray(globalThis.HOMONYM_DRAFT_PUZZLES)
-  ? globalThis.HOMONYM_DRAFT_PUZZLES
-  : Array.isArray(globalThis.HOMONYM_PUZZLES)
-    ? globalThis.HOMONYM_PUZZLES
-    : [];
 const {
   getPuzzleProgressLabel,
   getGuessShape,
   getGuessResult,
   buildShareGlyph,
-  getDailyPuzzleIndex,
   getAppMode,
+  getPuzzleSetForMode,
 } = globalThis.HomonymGameCore || {};
 
-const MAX_ATTEMPTS = 3;
-
-const progressPill = document.getElementById('progress-pill');
+const appMode = getAppMode ? getAppMode(window.location.pathname) : 'daily';
+const puzzles = getPuzzleSetForMode
+  ? getPuzzleSetForMode(appMode, {
+      publicPuzzle: globalThis.HOMONYM_TODAY_PUZZLE || null,
+      privateCorpus: Array.isArray(globalThis.HOMONYM_DRAFT_PUZZLES) ? globalThis.HOMONYM_DRAFT_PUZZLES : [],
+    })
+  : [];
 const difficultyBadge = document.getElementById('difficulty-badge');
 const clueText = document.getElementById('puzzle-title');
 const statusText = document.getElementById('status-text');
@@ -34,8 +33,9 @@ const shareCaption = document.getElementById('share-caption');
 const shareText = document.getElementById('share-text');
 const copyShareButton = document.getElementById('copy-share-button');
 
-const appMode = getAppMode ? getAppMode(window.location.pathname) : 'daily';
+const MAX_ATTEMPTS = 3;
 
+const progressPill = document.getElementById('progress-pill');
 let currentIndex = 0;
 let solvedCurrentPuzzle = false;
 let revealedCurrentPuzzle = false;
@@ -316,13 +316,10 @@ function handleNextPuzzle() {
 }
 
 function getInitialPuzzleIndex() {
-  if (appMode === 'admin') {
-    return 0;
-  }
-  return getDailyPuzzleIndex(getLocalDateString(), puzzles.length);
+  return 0;
 }
 
-if (!puzzles.length || !getPuzzleProgressLabel || !getGuessShape || !getGuessResult || !buildShareGlyph || !getDailyPuzzleIndex || !getAppMode) {
+if (!puzzles.length || !getPuzzleProgressLabel || !getGuessShape || !getGuessResult || !buildShareGlyph || !getAppMode || !getPuzzleSetForMode) {
   clueText.textContent = 'Setup incomplete';
   setStatus('Puzzle data or game logic failed to load.', 'error');
   guessInput.disabled = true;

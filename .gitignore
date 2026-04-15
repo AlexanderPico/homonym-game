@@ -10,3 +10,12 @@ coverage/
 # Editor / temp
 *.swp
 *.tmp
+
+# Hermes local planning artifacts
+.hermes/
+
+# Private/local-only puzzle assets
+content/puzzles/draft-40.js
+content/puzzles/starter-puzzles.js
+apps/web/admin/
+apps/web/data/*.js

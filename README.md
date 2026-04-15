@@ -3,14 +3,9 @@
 A wordplay game prototype for clueing homonym pairs that resolve into a valid phrase.
 
 Initial concept:
-- clue a two-word answer made of homonyms
+- clue a two-word answer made of homonyms or homophone pairs
 - answers should ideally form a legitimate phrase on their own
 - tone and polish should support eventual daily distribution in the style of NYT mini word games
-
-Examples:
-- loathsome test tube -> vile vial
-- lazy golden calf -> idle idol
-- thief of shepherd's tools -> crook crook
 
 This repository is structured for two horizons:
 1. near-term: a simple static web demo that opens locally on a phone or desktop browser
@@ -28,13 +23,13 @@ This repository is structured for two horizons:
 
 Open these files in a browser:
 - public daily page: `apps/web/index.html`
-- curator view: `apps/web/admin/index.html`
+- local/private curator view: `apps/web/admin/index.html`
 
-No build step is required for the current prototype.
+No build step is required for the current prototype, but the public page now expects a generated daily payload.
 
 Current demo behavior:
-- `/` acts as a single daily puzzle page
-- `/admin/` preserves the browse-and-curate `Next puzzle` workflow
+- `/` is intended to serve exactly one generated daily puzzle
+- local `/admin/` preserves the browse-and-curate `Next puzzle` workflow
 - typed guesses with no answer-revealing placeholder text
 - typo-aware near-match feedback for guesses that are one misspelling away
 - three-guess limit per puzzle
@@ -43,10 +38,9 @@ Current demo behavior:
 
 ## Current content state
 
-- `content/puzzles/starter-puzzles.js` preserves the original 3-puzzle seed set
-- `content/puzzles/draft-40.js` is the active 40-puzzle corpus for both the public daily page and the admin curator view
-- the 40-entry corpus now has revised difficulty assignments, including a real hard tier
-- `docs/content-notes.md` tracks the current shortlist, weak spots, and editorial rules
+- `content/puzzles/draft-40.js` is now a local/private corpus file and is ignored by git
+- `apps/web/data/today.js` is a generated local/public payload containing exactly one puzzle and is also ignored by git
+- `docs/content-notes.md` tracks editorial rules and file roles without exposing the private full draft file
 
 ## Reality check
 

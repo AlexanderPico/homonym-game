@@ -2,12 +2,7 @@
 
 ## Core mechanic
 
-A clue describes a phrase whose solution is a pair of homonyms.
-
-Examples:
-- loathsome test tube -> vile vial
-- lazy golden calf -> idle idol
-- thief of shepherd's tools -> crook crook
+A clue describes a phrase whose solution is a pair of homonyms or homophone-adjacent words.
 
 The player experience should feel like:
 1. read a compact clue
@@ -18,11 +13,11 @@ The player experience should feel like:
 ## Prototype interaction choice
 
 For the current prototype, split the experience into two routes:
-- `/` shows one date-selected daily puzzle
-- `/admin/` preserves sequential corpus browsing
+- `/` shows one generated public daily puzzle
+- local `/admin/` preserves sequential private corpus browsing
 - both routes use typed guesses and the same answer-checking rules
 - both routes keep reveal as an escape hatch
-- only `/admin/` exposes `Next puzzle`
+- only local `/admin/` exposes `Next puzzle`
 
 Reason:
 - public users should experience a true daily ritual rather than a browsing demo

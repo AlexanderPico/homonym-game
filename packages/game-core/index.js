@@ -135,6 +135,17 @@
     return 'daily';
   }
 
+  function getPuzzleSetForMode(mode, sources) {
+    const privateCorpus = Array.isArray(sources?.privateCorpus) ? sources.privateCorpus : [];
+    const publicPuzzle = sources?.publicPuzzle || null;
+
+    if (mode === 'admin') {
+      return privateCorpus;
+    }
+
+    return publicPuzzle ? [publicPuzzle] : [];
+  }
+
   function buildShareGlyph(results, maxAttempts) {
     const glyphs = {
       exact: '◆',
@@ -161,6 +172,7 @@
     getPuzzleProgressLabel,
     getDailyPuzzleIndex,
     getAppMode,
+    getPuzzleSetForMode,
     buildShareGlyph,
   };
 });

@@ -11,53 +11,54 @@ const {
   buildShareGlyph,
   getDailyPuzzleIndex,
   getAppMode,
+  getPuzzleSetForMode,
 } = require('../packages/game-core/index.js');
 
 test('normalizeGuess lowercases and collapses punctuation-like separators', () => {
-  assert.equal(normalizeGuess('  Vile   Vial  '), 'vile vial');
-  assert.equal(normalizeGuess('Idle-Idol'), 'idle idol');
-  assert.equal(normalizeGuess('Crook,   Crook!'), 'crook crook');
+  assert.equal(normalizeGuess('  Sample   Token  '), 'sample token');
+  assert.equal(normalizeGuess('Sample-Token'), 'sample token');
+  assert.equal(normalizeGuess('Sample,   Token!'), 'sample token');
 });
 
 test('getAcceptedAnswers derives the canonical answer from answerWords when present', () => {
   const puzzle = {
     displayAnswer: 'display only',
-    answerWords: ['vile', 'vial'],
-    aliases: ['vile-vial'],
+    answerWords: ['sample', 'token'],
+    aliases: ['sample-token'],
   };
 
-  assert.deepEqual(getAcceptedAnswers(puzzle), ['vile vial', 'vile-vial']);
+  assert.deepEqual(getAcceptedAnswers(puzzle), ['sample token', 'sample-token']);
 });
 
 test('isCorrectGuess accepts canonical answers and aliases after normalization', () => {
   const puzzle = {
-    displayAnswer: 'vile vial',
-    answerWords: ['vile', 'vial'],
-    aliases: ['vile-vial'],
+    displayAnswer: 'sample token',
+    answerWords: ['sample', 'token'],
+    aliases: ['sample-token'],
   };
 
-  assert.equal(isCorrectGuess(puzzle, 'Vile Vial'), true);
-  assert.equal(isCorrectGuess(puzzle, 'vile-vial'), true);
-  assert.equal(isCorrectGuess(puzzle, 'idle idol'), false);
+  assert.equal(isCorrectGuess(puzzle, 'Sample Token'), true);
+  assert.equal(isCorrectGuess(puzzle, 'sample-token'), true);
+  assert.equal(isCorrectGuess(puzzle, 'random phrase'), false);
 });
 
 test('getGuessShape distinguishes empty one-word two-word and longer guesses', () => {
   assert.equal(getGuessShape(''), 'empty');
-  assert.equal(getGuessShape('vile'), 'one-word');
-  assert.equal(getGuessShape('vile vial'), 'two-word');
-  assert.equal(getGuessShape('the vile vial'), 'longer');
+  assert.equal(getGuessShape('sample'), 'one-word');
+  assert.equal(getGuessShape('sample token'), 'two-word');
+  assert.equal(getGuessShape('the sample token'), 'longer');
 });
 
 test('getGuessResult marks exact, close typo, and miss distinctly', () => {
   const puzzle = {
-    displayAnswer: 'vile vial',
-    answerWords: ['vile', 'vial'],
-    aliases: ['vile-vial'],
+    displayAnswer: 'sample token',
+    answerWords: ['sample', 'token'],
+    aliases: ['sample-token'],
   };
 
-  assert.equal(getGuessResult(puzzle, 'vile vial'), 'exact');
-  assert.equal(getGuessResult(puzzle, 'vile vail'), 'close');
-  assert.equal(getGuessResult(puzzle, 'idle idol'), 'miss');
+  assert.equal(getGuessResult(puzzle, 'sample token'), 'exact');
+  assert.equal(getGuessResult(puzzle, 'sample tokan'), 'close');
+  assert.equal(getGuessResult(puzzle, 'random phrase'), 'miss');
 });
 
 test('buildShareGlyph summarizes three-attempt runs without spoilers', () => {
@@ -79,6 +80,15 @@ test('getAppMode distinguishes admin and daily routes', () => {
   assert.equal(getAppMode('/admin'), 'admin');
   assert.equal(getAppMode('/admin/'), 'admin');
   assert.equal(getAppMode('/admin/index.html'), 'admin');
+});
+
+test('getPuzzleSetForMode uses only public daily puzzle for daily mode and private corpus for admin', () => {
+  const privateCorpus = [{ id: 'private-1' }, { id: 'private-2' }];
+  const publicPuzzle = { id: 'public-today' };
+
+  assert.deepEqual(getPuzzleSetForMode('daily', { publicPuzzle, privateCorpus }), [publicPuzzle]);
+  assert.deepEqual(getPuzzleSetForMode('admin', { publicPuzzle, privateCorpus }), privateCorpus);
+  assert.deepEqual(getPuzzleSetForMode('daily', { publicPuzzle: null, privateCorpus }), []);
 });
 
 test('getPuzzleProgressLabel reports current position for demo next flow', () => {
