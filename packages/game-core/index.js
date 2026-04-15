@@ -9,7 +9,7 @@
   function normalizeGuess(value) {
     return String(value || '')
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, ' ')
+      .replace(/[^\p{L}\p{N}]+/gu, ' ')
       .trim()
       .replace(/\s+/g, ' ');
   }
@@ -127,17 +127,26 @@
     return (ordinal + 9) % total;
   }
 
-  function getAppMode(pathname) {
+  function getRouteConfig(pathname) {
     const normalized = String(pathname || '/').replace(/\/+$/, '') || '/';
-    if (normalized === '/admin' || normalized.endsWith('/admin') || normalized.endsWith('/admin/index.html')) {
-      return 'admin';
-    }
-    return 'daily';
+    const isJapanese = normalized === '/jp' || normalized.startsWith('/jp/');
+    const locale = isJapanese ? 'jp' : 'en';
+    const adminSuffix = isJapanese ? '/jp/admin' : '/admin';
+    const mode = normalized === adminSuffix || normalized.endsWith(`${adminSuffix}/index.html`) ? 'admin' : 'daily';
+    return { locale, mode };
   }
 
-  function getPuzzleSetForMode(mode, sources) {
-    const privateCorpus = Array.isArray(sources?.privateCorpus) ? sources.privateCorpus : [];
-    const publicPuzzle = sources?.publicPuzzle || null;
+  function getAppMode(pathname) {
+    return getRouteConfig(pathname).mode;
+  }
+
+  function getPuzzleSetForMode(route, sources) {
+    const locale = route?.locale || 'en';
+    const mode = route?.mode || 'daily';
+    const privateCorpusByLocale = sources?.privateCorpusByLocale || {};
+    const publicPuzzleByLocale = sources?.publicPuzzleByLocale || {};
+    const privateCorpus = Array.isArray(privateCorpusByLocale[locale]) ? privateCorpusByLocale[locale] : [];
+    const publicPuzzle = publicPuzzleByLocale[locale] || null;
 
     if (mode === 'admin') {
       return privateCorpus;
@@ -186,6 +195,7 @@
     getGuessShape,
     getPuzzleProgressLabel,
     getDailyPuzzleIndex,
+    getRouteConfig,
     getAppMode,
     getPuzzleSetForMode,
     selectPublicPuzzle,

@@ -5,41 +5,62 @@ const { getDailyPuzzleIndex, selectPublicPuzzle } = require('../packages/game-co
 
 const repoRoot = path.resolve(__dirname, '..');
 const envPrivateCorpusPath = process.env.PRIVATE_CORPUS_PATH;
+const envPrivateCorpusRoot = process.env.PRIVATE_CORPUS_ROOT;
 const localSourcePathFile = path.join(repoRoot, 'content', 'private', 'source-repo-path.txt');
 const localPrivateCorpusPath = path.join(repoRoot, 'content', 'private', 'daily-corpus.js');
 
-function resolvePrivateCorpusPath() {
-  if (envPrivateCorpusPath) {
-    return envPrivateCorpusPath;
+function resolveSourceRoot() {
+  if (envPrivateCorpusRoot) {
+    return path.resolve(envPrivateCorpusRoot);
   }
 
   if (fs.existsSync(localSourcePathFile)) {
     const pointedPath = fs.readFileSync(localSourcePathFile, 'utf8').trim();
     if (pointedPath) {
-      const resolved = path.resolve(repoRoot, pointedPath);
-      const asFile = resolved;
-      const asRepoCorpus = path.join(resolved, 'content', 'puzzles', 'draft-40.js');
-      if (fs.existsSync(asFile) && fs.statSync(asFile).isFile()) {
-        return asFile;
-      }
-      if (fs.existsSync(asRepoCorpus) && fs.statSync(asRepoCorpus).isFile()) {
-        return asRepoCorpus;
-      }
+      return path.resolve(repoRoot, pointedPath);
+    }
+  }
+
+  return null;
+}
+
+function resolvePrivateCorpusPath(locale) {
+  if (locale === 'en' && envPrivateCorpusPath) {
+    return envPrivateCorpusPath;
+  }
+
+  const sourceRoot = resolveSourceRoot();
+  if (sourceRoot) {
+    const corpusFile = locale === 'jp' ? 'jp-draft.js' : 'draft-40.js';
+    const repoCorpus = path.join(sourceRoot, 'content', 'puzzles', corpusFile);
+    if (fs.existsSync(repoCorpus) && fs.statSync(repoCorpus).isFile()) {
+      return repoCorpus;
     }
   }
 
   return localPrivateCorpusPath;
 }
 
-function getPublishConfigPath(privateCorpusPath) {
-  return path.resolve(path.dirname(privateCorpusPath), '..', '..', 'config', 'public-publish.json');
+function publishConfigPathFor(corpusPath, locale) {
+  const configFile = locale === 'jp' ? 'public-publish-jp.json' : 'public-publish.json';
+  return path.resolve(path.dirname(corpusPath), '..', '..', 'config', configFile);
+}
+
+function loadCorpus(corpusPath, globalName) {
+  const context = { globalThis: {} };
+  vm.createContext(context);
+  vm.runInContext(fs.readFileSync(corpusPath, 'utf8'), context, { filename: corpusPath });
+  const corpus = context.globalThis[globalName];
+  if (!Array.isArray(corpus) || !corpus.length) {
+    throw new Error(`Corpus ${globalName} missing or empty in ${corpusPath}`);
+  }
+  return corpus;
 }
 
 function loadPublishOverride(publishConfigPath) {
   if (!fs.existsSync(publishConfigPath)) {
     return null;
   }
-
   try {
     const config = JSON.parse(fs.readFileSync(publishConfigPath, 'utf8'));
     if (config && config.mode === 'manual' && typeof config.puzzle_id === 'string' && config.puzzle_id.trim()) {
@@ -48,43 +69,37 @@ function loadPublishOverride(publishConfigPath) {
   } catch (error) {
     console.warn(`Ignoring unreadable publish config: ${publishConfigPath}`);
   }
-
   return null;
 }
 
-const privateCorpusPath = resolvePrivateCorpusPath();
-const outputDir = path.join(repoRoot, 'apps', 'web', 'data');
-const outputPath = path.join(outputDir, 'today.js');
+function buildLocale(locale, options) {
+  const globalName = locale === 'jp' ? 'HOMONYM_JP_DRAFT_PUZZLES' : 'HOMONYM_DRAFT_PUZZLES';
+  const outputDir = locale === 'jp' ? path.join(repoRoot, 'apps', 'web', 'jp', 'data') : path.join(repoRoot, 'apps', 'web', 'data');
+  const outputFile = locale === 'jp' ? 'today-jp.js' : 'today.js';
+  const globalOutputName = locale === 'jp' ? 'HOMONYM_TODAY_PUZZLE_JP' : 'HOMONYM_TODAY_PUZZLE';
 
-if (!fs.existsSync(privateCorpusPath)) {
-  console.error(`Missing private corpus: ${privateCorpusPath}`);
-  process.exit(1);
+  const corpusPath = resolvePrivateCorpusPath(locale);
+  if (!fs.existsSync(corpusPath)) {
+    throw new Error(`Missing private corpus for ${locale}: ${corpusPath}`);
+  }
+
+  const corpus = loadCorpus(corpusPath, globalName);
+  const publishOverride = loadPublishOverride(publishConfigPathFor(corpusPath, locale));
+  const puzzle = selectPublicPuzzle(corpus, options.dateString, publishOverride);
+
+  fs.mkdirSync(outputDir, { recursive: true });
+  const payload = `(function (root) {\n  root.${globalOutputName} = ${JSON.stringify(puzzle, null, 2)};\n})(typeof globalThis !== 'undefined' ? globalThis : this);\n`;
+  fs.writeFileSync(path.join(outputDir, outputFile), payload);
+
+  console.log(`[${locale}] corpus: ${corpusPath}`);
+  console.log(`[${locale}] override puzzle id: ${publishOverride || '<none>'}`);
+  console.log(`[${locale}] published puzzle id: ${puzzle.id}`);
 }
 
-const context = { globalThis: {} };
-vm.createContext(context);
-vm.runInContext(fs.readFileSync(privateCorpusPath, 'utf8'), context, { filename: privateCorpusPath });
-
-const corpus = context.globalThis.HOMONYM_DRAFT_PUZZLES;
-if (!Array.isArray(corpus) || !corpus.length) {
-  console.error('Private corpus did not define HOMONYM_DRAFT_PUZZLES');
-  process.exit(1);
-}
-
-const publishConfigPath = getPublishConfigPath(privateCorpusPath);
-const overridePuzzleId = loadPublishOverride(publishConfigPath);
 const dateArg = process.argv[2];
 const now = new Date();
 const dateString = dateArg || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-const index = getDailyPuzzleIndex(dateString, corpus.length);
-const puzzle = selectPublicPuzzle(corpus, dateString, overridePuzzleId);
 
-fs.mkdirSync(outputDir, { recursive: true });
-const payload = `(function (root) {\n  root.HOMONYM_TODAY_PUZZLE = ${JSON.stringify(puzzle, null, 2)};\n})(typeof globalThis !== 'undefined' ? globalThis : this);\n`;
-fs.writeFileSync(outputPath, payload);
-
-console.log(`Wrote ${outputPath}`);
 console.log(`Date: ${dateString}`);
-console.log(`Puzzle index: ${index}`);
-console.log(`Override puzzle id: ${overridePuzzleId || '<none>'}`);
-console.log(`Published puzzle id: ${puzzle.id}`);
+buildLocale('en', { dateString });
+buildLocale('jp', { dateString });

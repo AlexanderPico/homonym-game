@@ -28,19 +28,21 @@ Open these files in a browser:
 No build step is required for the current prototype, but the public page now expects a generated daily payload.
 
 Current demo behavior:
-- `/` is intended to serve exactly one generated daily puzzle
-- local `/admin/` preserves the browse-and-curate `Next puzzle` workflow
+- `/` is intended to serve exactly one generated English daily puzzle
+- `/jp/` is intended to serve exactly one generated Japanese daily puzzle
+- local `/admin/` preserves the English browse-and-curate `Next puzzle` workflow
+- local `/jp/admin/` preserves the Japanese browse-and-curate workflow
 - typed guesses with no answer-revealing placeholder text
-- typo-aware near-match feedback for guesses that are one misspelling away
-- three-guess limit per puzzle
+- typo-aware near-match feedback for English guesses that are one misspelling away
 - spoiler-safe share glyph summary after solve, fail, or reveal
 - editorial styling aimed at a polished daily-game feel
 
 ## Current content state
 
 - unpublished corpus and curator-only files should live outside this public repo
-- this public repo only generates and serves one daily payload at a time
-- `apps/web/data/today.js` is a generated local/public payload containing exactly one puzzle and is ignored by git
+- this public repo only generates and serves one daily payload at a time per locale
+- `apps/web/data/today.js` is the generated English daily payload and is ignored by git
+- `apps/web/jp/data/today-jp.js` is the generated Japanese daily payload and is ignored by git
 - `docs/content-notes.md` tracks editorial rules and file roles without exposing private corpus details
 
 ## Reality check

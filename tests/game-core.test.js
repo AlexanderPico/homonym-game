@@ -10,7 +10,7 @@ const {
   getGuessResult,
   buildShareGlyph,
   getDailyPuzzleIndex,
-  getAppMode,
+  getRouteConfig,
   getPuzzleSetForMode,
   selectPublicPuzzle,
 } = require('../packages/game-core/index.js');
@@ -19,6 +19,7 @@ test('normalizeGuess lowercases and collapses punctuation-like separators', () =
   assert.equal(normalizeGuess('  Sample   Token  '), 'sample token');
   assert.equal(normalizeGuess('Sample-Token'), 'sample token');
   assert.equal(normalizeGuess('Sample,   Token!'), 'sample token');
+  assert.equal(normalizeGuess('  記者  汽車  '), '記者 汽車');
 });
 
 test('getAcceptedAnswers derives the canonical answer from answerWords when present', () => {
@@ -75,21 +76,30 @@ test('getDailyPuzzleIndex is deterministic and stays in range', () => {
   assert.ok(getDailyPuzzleIndex('2026-04-14', 40) < 40);
 });
 
-test('getAppMode distinguishes admin and daily routes', () => {
-  assert.equal(getAppMode('/'), 'daily');
-  assert.equal(getAppMode('/index.html'), 'daily');
-  assert.equal(getAppMode('/admin'), 'admin');
-  assert.equal(getAppMode('/admin/'), 'admin');
-  assert.equal(getAppMode('/admin/index.html'), 'admin');
+test('getRouteConfig distinguishes locale and mode', () => {
+  assert.deepEqual(getRouteConfig('/'), { locale: 'en', mode: 'daily' });
+  assert.deepEqual(getRouteConfig('/index.html'), { locale: 'en', mode: 'daily' });
+  assert.deepEqual(getRouteConfig('/admin'), { locale: 'en', mode: 'admin' });
+  assert.deepEqual(getRouteConfig('/jp'), { locale: 'jp', mode: 'daily' });
+  assert.deepEqual(getRouteConfig('/jp/'), { locale: 'jp', mode: 'daily' });
+  assert.deepEqual(getRouteConfig('/jp/index.html'), { locale: 'jp', mode: 'daily' });
+  assert.deepEqual(getRouteConfig('/jp/admin'), { locale: 'jp', mode: 'admin' });
+  assert.deepEqual(getRouteConfig('/jp/admin/index.html'), { locale: 'jp', mode: 'admin' });
 });
 
-test('getPuzzleSetForMode uses only public daily puzzle for daily mode and private corpus for admin', () => {
-  const privateCorpus = [{ id: 'private-1' }, { id: 'private-2' }];
-  const publicPuzzle = { id: 'public-today' };
+test('getPuzzleSetForMode uses locale-specific public puzzle for daily mode and locale corpus for admin', () => {
+  const privateCorpusByLocale = {
+    en: [{ id: 'en-1' }],
+    jp: [{ id: 'jp-1' }, { id: 'jp-2' }],
+  };
+  const publicPuzzleByLocale = {
+    en: { id: 'public-en' },
+    jp: { id: 'public-jp' },
+  };
 
-  assert.deepEqual(getPuzzleSetForMode('daily', { publicPuzzle, privateCorpus }), [publicPuzzle]);
-  assert.deepEqual(getPuzzleSetForMode('admin', { publicPuzzle, privateCorpus }), privateCorpus);
-  assert.deepEqual(getPuzzleSetForMode('daily', { publicPuzzle: null, privateCorpus }), []);
+  assert.deepEqual(getPuzzleSetForMode({ locale: 'en', mode: 'daily' }, { publicPuzzleByLocale, privateCorpusByLocale }), [{ id: 'public-en' }]);
+  assert.deepEqual(getPuzzleSetForMode({ locale: 'jp', mode: 'daily' }, { publicPuzzleByLocale, privateCorpusByLocale }), [{ id: 'public-jp' }]);
+  assert.deepEqual(getPuzzleSetForMode({ locale: 'jp', mode: 'admin' }, { publicPuzzleByLocale, privateCorpusByLocale }), [{ id: 'jp-1' }, { id: 'jp-2' }]);
 });
 
 test('selectPublicPuzzle uses override id when present and falls back to date index otherwise', () => {

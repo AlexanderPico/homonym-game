@@ -7,10 +7,12 @@ Homonym Game is a short-form word puzzle built around clues that resolve into a 
 - a legitimate phrase in ordinary English
 
 Current direction:
-- `/` is the public daily puzzle page and should only receive one generated puzzle payload at a time
-- local `/admin/` is the curator browse-and-review page
+- `/` is the public English daily puzzle page and should only receive one generated puzzle payload at a time
+- `/jp/` is the public Japanese daily puzzle page and should only receive one generated puzzle payload at a time
+- local `/admin/` is the English curator browse-and-review page
+- local `/jp/admin/` is the Japanese curator browse-and-review page
 - typed guesses as the default interaction
-- daily selection comes from the private curated corpus and is exported into a single public payload
+- daily selection comes from private curated corpora and is exported into single public payloads
 - mobile-first
 - visually restrained, editorial, and shareable
 

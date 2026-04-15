@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Homonym Game JP</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="masthead">
+        <p class="section-label">日本語版</p>
+        <div class="masthead-row">
+          <h1>Homonym Game JP</h1>
+          <div id="progress-pill" class="progress-pill" aria-live="polite">今日のパズル</div>
+        </div>
+        <p class="lede">
+          今日のヒントから、音が同じ二語の答えを見つけてください。
+        </p>
+      </header>
+
+      <section class="game-card" aria-labelledby="puzzle-title">
+        <div class="card-meta-row">
+          <p class="card-label">今日のヒント</p>
+          <p id="difficulty-badge" class="difficulty-badge">Medium</p>
+        </div>
+
+        <h2 id="puzzle-title" class="clue-text">今日のヒントがここに入ります</h2>
+        <p id="status-text" class="status-text">答えを入力してください。</p>
+
+        <section class="attempts-panel" aria-label="guess tracking">
+          <div class="attempts-copy">
+            <p class="attempts-label">試行回数</p>
+            <p id="attempt-summary" class="attempt-summary">3 guesses left</p>
+          </div>
+          <div id="attempt-glyphs" class="attempt-glyphs" aria-live="polite">— — —</div>
+        </section>
+
+        <form id="guess-form" class="guess-form" novalidate>
+          <label class="guess-label" for="guess-input">あなたの答え</label>
+          <div class="guess-row">
+            <input
+              id="guess-input"
+              name="guess"
+              class="guess-input"
+              type="text"
+              inputmode="text"
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+              placeholder="二語の答えを入力"
+              aria-describedby="status-text"
+            />
+            <button id="check-button" type="submit" class="primary-button">判定</button>
+          </div>
+        </form>
+
+        <div class="action-row">
+          <button id="reveal-button" type="button" class="secondary-button">答えを見る</button>
+        </div>
+
+        <section id="result-panel" class="result-panel" aria-live="polite" hidden>
+          <p class="result-label">答え</p>
+          <div id="answer-text" class="answer-text">答えはここに表示</div>
+          <ul id="explanation-list" class="explanation-list"></ul>
+          <p id="notes-text" class="notes-text"></p>
+        </section>
+
+        <section id="share-panel" class="share-panel" aria-live="polite" hidden>
+          <div class="share-header">
+            <div>
+              <p class="result-label">共有</p>
+              <p id="share-caption" class="share-caption">ネタバレなし</p>
+            </div>
+            <button id="copy-share-button" type="button" class="secondary-button secondary-button--compact">
+              コピー
+            </button>
+          </div>
+          <pre id="share-text" class="share-text"></pre>
+        </section>
+      </section>
+    </main>
+
+    <script src="./data/today-jp.js"></script>
+    <script src="../../packages/game-core/index.js"></script>
+    <script src="../app.js"></script>
+  </body>
+</html>

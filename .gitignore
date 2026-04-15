@@ -20,4 +20,6 @@ AGENT_README.local.md
 # Private/local-only assets
 content/
 apps/web/admin/
+apps/web/jp/admin/
 apps/web/data/*.js
+apps/web/jp/data/*.js

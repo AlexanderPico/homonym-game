@@ -1,10 +1,11 @@
 Public daily data lives here.
 
 Files:
-- `today.js` — generated local-only payload containing exactly one publishable puzzle for the public site
+- `today.js` — generated payload containing exactly one English puzzle for the public site
+- `today-jp.js` — generated payload containing exactly one Japanese puzzle for the public site
 
 Notes:
-- `today.js` is ignored by git and must never be committed to the public repo
-- generate it from the private corpus with:
+- both generated payloads are ignored by git and must never be committed to the public repo
+- generate them from the source corpus with:
   - `node scripts/build-public-daily.js`
   - or `node scripts/build-public-daily.js YYYY-MM-DD`
