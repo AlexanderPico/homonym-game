@@ -12,6 +12,7 @@ const {
   getDailyPuzzleIndex,
   getAppMode,
   getPuzzleSetForMode,
+  selectPublicPuzzle,
 } = require('../packages/game-core/index.js');
 
 test('normalizeGuess lowercases and collapses punctuation-like separators', () => {
@@ -89,6 +90,12 @@ test('getPuzzleSetForMode uses only public daily puzzle for daily mode and priva
   assert.deepEqual(getPuzzleSetForMode('daily', { publicPuzzle, privateCorpus }), [publicPuzzle]);
   assert.deepEqual(getPuzzleSetForMode('admin', { publicPuzzle, privateCorpus }), privateCorpus);
   assert.deepEqual(getPuzzleSetForMode('daily', { publicPuzzle: null, privateCorpus }), []);
+});
+
+test('selectPublicPuzzle uses override id when present and falls back to date index otherwise', () => {
+  const corpus = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+  assert.deepEqual(selectPublicPuzzle(corpus, '2026-04-14', 'b'), { id: 'b' });
+  assert.deepEqual(selectPublicPuzzle(corpus, '2026-04-14', 'missing'), corpus[getDailyPuzzleIndex('2026-04-14', 3)]);
 });
 
 test('getPuzzleProgressLabel reports current position for demo next flow', () => {

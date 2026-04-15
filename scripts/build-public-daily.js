@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const { getDailyPuzzleIndex } = require('../packages/game-core/index.js');
+const { getDailyPuzzleIndex, selectPublicPuzzle } = require('../packages/game-core/index.js');
 
 const repoRoot = path.resolve(__dirname, '..');
 const envPrivateCorpusPath = process.env.PRIVATE_CORPUS_PATH;
@@ -31,6 +31,27 @@ function resolvePrivateCorpusPath() {
   return localPrivateCorpusPath;
 }
 
+function getPublishConfigPath(privateCorpusPath) {
+  return path.resolve(path.dirname(privateCorpusPath), '..', '..', 'config', 'public-publish.json');
+}
+
+function loadPublishOverride(publishConfigPath) {
+  if (!fs.existsSync(publishConfigPath)) {
+    return null;
+  }
+
+  try {
+    const config = JSON.parse(fs.readFileSync(publishConfigPath, 'utf8'));
+    if (config && config.mode === 'manual' && typeof config.puzzle_id === 'string' && config.puzzle_id.trim()) {
+      return config.puzzle_id.trim();
+    }
+  } catch (error) {
+    console.warn(`Ignoring unreadable publish config: ${publishConfigPath}`);
+  }
+
+  return null;
+}
+
 const privateCorpusPath = resolvePrivateCorpusPath();
 const outputDir = path.join(repoRoot, 'apps', 'web', 'data');
 const outputPath = path.join(outputDir, 'today.js');
@@ -50,11 +71,13 @@ if (!Array.isArray(corpus) || !corpus.length) {
   process.exit(1);
 }
 
+const publishConfigPath = getPublishConfigPath(privateCorpusPath);
+const overridePuzzleId = loadPublishOverride(publishConfigPath);
 const dateArg = process.argv[2];
 const now = new Date();
 const dateString = dateArg || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 const index = getDailyPuzzleIndex(dateString, corpus.length);
-const puzzle = corpus[index];
+const puzzle = selectPublicPuzzle(corpus, dateString, overridePuzzleId);
 
 fs.mkdirSync(outputDir, { recursive: true });
 const payload = `(function (root) {\n  root.HOMONYM_TODAY_PUZZLE = ${JSON.stringify(puzzle, null, 2)};\n})(typeof globalThis !== 'undefined' ? globalThis : this);\n`;
@@ -63,4 +86,5 @@ fs.writeFileSync(outputPath, payload);
 console.log(`Wrote ${outputPath}`);
 console.log(`Date: ${dateString}`);
 console.log(`Puzzle index: ${index}`);
-console.log(`Puzzle id: ${puzzle.id}`);
+console.log(`Override puzzle id: ${overridePuzzleId || '<none>'}`);
+console.log(`Published puzzle id: ${puzzle.id}`);

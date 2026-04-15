@@ -146,6 +146,21 @@
     return publicPuzzle ? [publicPuzzle] : [];
   }
 
+  function selectPublicPuzzle(corpus, dateString, overrideId) {
+    if (!Array.isArray(corpus) || !corpus.length) {
+      return null;
+    }
+
+    if (overrideId) {
+      const overridePuzzle = corpus.find((puzzle) => puzzle && puzzle.id === overrideId);
+      if (overridePuzzle) {
+        return overridePuzzle;
+      }
+    }
+
+    return corpus[getDailyPuzzleIndex(dateString, corpus.length)] || null;
+  }
+
   function buildShareGlyph(results, maxAttempts) {
     const glyphs = {
       exact: '◆',
@@ -173,6 +188,7 @@
     getDailyPuzzleIndex,
     getAppMode,
     getPuzzleSetForMode,
+    selectPublicPuzzle,
     buildShareGlyph,
   };
 });
