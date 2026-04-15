@@ -1,0 +1,75 @@
+name: Deploy public daily puzzle to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public repo
+        uses: actions/checkout@v4
+
+      - name: Checkout private corpus repo
+        uses: actions/checkout@v4
+        with:
+          repository: AlexanderPico/homonym-game-private
+          path: private-repo
+          ssh-key: ${{ secrets.PRIVATE_REPO_SSH_KEY }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Generate today's public puzzle payload
+        env:
+          PRIVATE_CORPUS_PATH: ${{ github.workspace }}/private-repo/content/puzzles/draft-40.js
+        run: node scripts/build-public-daily.js
+
+      - name: Assemble Pages artifact
+        run: |
+          mkdir -p site/data
+          cp apps/web/index.html site/index.html
+          cp apps/web/app.js site/app.js
+          cp apps/web/styles.css site/styles.css
+          cp apps/web/data/today.js site/data/today.js
+          cp packages/game-core/index.js site/game-core.js
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('site/index.html')
+          html = path.read_text()
+          html = html.replace('../../packages/game-core/index.js', './game-core.js')
+          path.write_text(html)
+          PY
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

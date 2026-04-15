@@ -4,9 +4,10 @@ const vm = require('node:vm');
 const { getDailyPuzzleIndex } = require('../packages/game-core/index.js');
 
 const repoRoot = path.resolve(__dirname, '..');
+const envPrivateCorpusPath = process.env.PRIVATE_CORPUS_PATH;
 const siblingPrivateCorpusPath = path.resolve(repoRoot, '..', 'homonym-game-private', 'content', 'puzzles', 'draft-40.js');
 const localPrivateCorpusPath = path.join(repoRoot, 'content', 'puzzles', 'draft-40.js');
-const privateCorpusPath = fs.existsSync(siblingPrivateCorpusPath) ? siblingPrivateCorpusPath : localPrivateCorpusPath;
+const privateCorpusPath = envPrivateCorpusPath || (fs.existsSync(siblingPrivateCorpusPath) ? siblingPrivateCorpusPath : localPrivateCorpusPath);
 const outputDir = path.join(repoRoot, 'apps', 'web', 'data');
 const outputPath = path.join(outputDir, 'today.js');
 

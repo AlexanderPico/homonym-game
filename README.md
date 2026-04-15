@@ -68,7 +68,8 @@ For the current static build, the simplest shareable URL path is GitHub Pages.
 Suggested setup:
 - keep this public repo as the Pages/deploy repo
 - keep unpublished corpus + curator files in the sibling private repo `../homonym-game-private/`
-- run `node scripts/build-public-daily.js` before publishing
+- add a GitHub Actions secret named `PRIVATE_REPO_SSH_KEY` containing a read-only deploy key for the private repo
+- the included Pages workflow will generate `today.js` during deployment
 - share the published root URL for the daily page
 
 Because the app is still static, GitHub Pages is the lowest-friction choice for initial user testing.
