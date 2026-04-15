@@ -18,7 +18,7 @@ coverage/
 AGENT_README.local.md
 
 # Private/local-only assets
-content/
+.local/
 apps/web/admin/
 apps/web/jp/admin/
 apps/web/data/*.js

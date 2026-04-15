@@ -33,7 +33,8 @@ That means:
 
 - unpublished corpus and curator-only assets — keep outside this public repo
 - `apps/web/data/today.js` — generated single-puzzle public payload, ignored by git
-- `content/puzzles/README.md` — non-sensitive notes about puzzle file roles
+- `apps/web/jp/data/today-jp.js` — generated Japanese single-puzzle public payload, ignored by git
+- local source pointer file — `.local/source-repo-path.txt`, ignored by git
 
 ## Current prototype schema
 

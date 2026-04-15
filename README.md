@@ -14,8 +14,8 @@ This repository is structured for two horizons:
 ## Repository layout
 
 - `apps/web/` — local-openable web prototype
-- `content/puzzles/` — puzzle corpus and future authoring assets
 - `packages/game-core/` — reusable normalization and answer-checking utilities
+- `scripts/` — build/export helpers for public daily payloads
 - `docs/` — roadmap, design, and implementation notes
 - `tests/` — lightweight automated checks for core game logic
 

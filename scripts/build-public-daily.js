@@ -6,8 +6,8 @@ const { getDailyPuzzleIndex, selectPublicPuzzle } = require('../packages/game-co
 const repoRoot = path.resolve(__dirname, '..');
 const envPrivateCorpusPath = process.env.PRIVATE_CORPUS_PATH;
 const envPrivateCorpusRoot = process.env.PRIVATE_CORPUS_ROOT;
-const localSourcePathFile = path.join(repoRoot, 'content', 'private', 'source-repo-path.txt');
-const localPrivateCorpusPath = path.join(repoRoot, 'content', 'private', 'daily-corpus.js');
+const localSourcePathFile = path.join(repoRoot, '.local', 'source-repo-path.txt');
+const localPrivateCorpusPath = path.join(repoRoot, '.local', 'daily-corpus.js');
 
 function resolveSourceRoot() {
   if (envPrivateCorpusRoot) {
