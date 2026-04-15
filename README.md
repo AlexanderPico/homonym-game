@@ -69,7 +69,7 @@ Suggested setup:
 - keep unpublished corpus + curator files in a separate non-public source repo
 - add two GitHub Actions secrets in the public repo:
   - `SOURCE_REPO_URL`
-  - `SOURCE_REPO_SSH_KEY`
+  - `SOURCE_REPO_SSH_KEY_B64`
 - the included Pages workflow will generate `today.js` during deployment
 - share the published root URL for the daily page
 

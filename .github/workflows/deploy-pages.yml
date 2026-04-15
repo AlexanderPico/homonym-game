@@ -23,10 +23,10 @@ jobs:
 
       - name: Setup SSH key for source checkout
         env:
-          SOURCE_REPO_SSH_KEY: ${{ secrets.SOURCE_REPO_SSH_KEY }}
+          SOURCE_REPO_SSH_KEY_B64: ${{ secrets.SOURCE_REPO_SSH_KEY_B64 }}
         run: |
           mkdir -p ~/.ssh
-          printf '%s' "$SOURCE_REPO_SSH_KEY" | tr -d '\r' > ~/.ssh/source_repo_key
+          printf '%s' "$SOURCE_REPO_SSH_KEY_B64" | base64 --decode > ~/.ssh/source_repo_key
           chmod 600 ~/.ssh/source_repo_key
           ssh-keyscan github.com >> ~/.ssh/known_hosts
           ssh-keygen -y -f ~/.ssh/source_repo_key >/dev/null
