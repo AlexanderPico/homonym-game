@@ -14,8 +14,7 @@ coverage/
 # Hermes local planning artifacts
 .hermes/
 
-# Private/local-only puzzle assets
-content/puzzles/draft-40.js
-content/puzzles/starter-puzzles.js
+# Private/local-only assets
+content/
 apps/web/admin/
 apps/web/data/*.js

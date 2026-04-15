@@ -38,8 +38,10 @@ Current demo behavior:
 
 ## Current content state
 
-- `content/puzzles/draft-40.js` is now a local/private corpus file and is ignored by git
-- `apps/web/data/today.js` is a generated local/public payload containing exactly one puzzle and is also ignored by git
+- private unpublished corpus and curator-only files now live in the sibling private repo:
+  - `../homonym-game-private/`
+- this public repo only generates and serves one daily payload at a time
+- `apps/web/data/today.js` is a generated local/public payload containing exactly one puzzle and is ignored by git
 - `docs/content-notes.md` tracks editorial rules and file roles without exposing the private full draft file
 
 ## Reality check
@@ -64,10 +66,10 @@ So the current recommendation is:
 For the current static build, the simplest shareable URL path is GitHub Pages.
 
 Suggested setup:
-- push this repo to GitHub
-- enable Pages for the default branch or `docs/`/GitHub Actions static deploy
+- keep this public repo as the Pages/deploy repo
+- keep unpublished corpus + curator files in the sibling private repo `../homonym-game-private/`
+- run `node scripts/build-public-daily.js` before publishing
 - share the published root URL for the daily page
-- use `/admin/` only as the curator route
 
 Because the app is still static, GitHub Pages is the lowest-friction choice for initial user testing.
 
