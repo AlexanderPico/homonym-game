@@ -20,3 +20,6 @@ apps/web/admin/
 apps/web/jp/admin/
 apps/web/data/*.js
 apps/web/jp/data/*.js
+
+# Local agent orientation files
+AGENTS_README.local.md
