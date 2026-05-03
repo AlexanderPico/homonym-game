@@ -1,0 +1,8 @@
+{
+  "name": "homonym-game",
+  "private": true,
+  "description": "Static homonym wordplay prototype smoke-test harness",
+  "scripts": {
+    "test": "node --test tests/*.test.js tests/*.js"
+  }
+}

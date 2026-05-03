@@ -86,10 +86,11 @@ Because the app is still static, GitHub Pages is the lowest-friction choice for 
 ## Verification
 
 Run the current tests:
-- `node --test tests/game-core.test.js`
+- `npm test` — runs the full Node built-in smoke suite (`tests/game-core.test.js` and `tests/moderation-helper.test.js`)
+
+GitHub Actions now runs the same smoke suite on pushes and pull requests to `main`.
 
 ## Near-term goals
-
 - expand and tighten the reviewed puzzle corpus
 - tune answer validation and hint policy
 - improve completion/share states
