@@ -86,9 +86,10 @@ Because the app is still static, GitHub Pages is the lowest-friction choice for 
 ## Verification
 
 Run the current tests:
-- `npm test` — runs the full Node built-in smoke suite (`tests/game-core.test.js` and `tests/moderation-helper.test.js`)
+- `npm test` — runs the full Node built-in smoke suite, including core gameplay, moderation helper, and publish-path coverage
+- `npm run test:publish` — runs the secret-free fixture test for `scripts/build-public-daily.js` and verifies English/Japanese daily payload generation from a local corpus root
 
-GitHub Actions now runs the same smoke suite on pushes and pull requests to `main`.
+GitHub Actions now runs both `npm test` and `npm run test:publish` on pushes and pull requests to `main`.
 
 ## Near-term goals
 - expand and tighten the reviewed puzzle corpus
